@@ -4,6 +4,8 @@ navbar:
   left:
     - text: "Home"
       href: index.html
+    - text: "Home"
+      href: index2.html
   right: 
     - icon: fa-envelope fa-lg
       href: mailto:<cats@catemail.com>
@@ -11,4 +13,4 @@ navbar:
       href: http://github.com/Bastian951/
 output:
   html_document:
-    theme: darkly
+    theme: yeti
