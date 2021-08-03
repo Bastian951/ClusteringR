@@ -13,4 +13,4 @@ navbar:
       href: http://github.com/Bastian951/
 output:
   html_document:
-    theme: yeti
+    theme: simplex
