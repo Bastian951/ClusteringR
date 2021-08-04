@@ -2,10 +2,12 @@ name: "Clustering en R"
 navbar:
   title: "Clustering en R"
   left:
-    - text: "Introducción"
+    - text: "Inicio"
       href: index.html
+    - text: "Introducción"
+      href: intro.html
     - text: "Cluster Jerarquico"
-      href: index2.html
+      href: jerarquico.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/
