@@ -1,10 +1,8 @@
----
-title: "Apunte Clustering in R"
----
+# Apunte Clustering in R
 
 
 
-En este R [notebook]<https://bastian951.github.io/ClusteringR>. encontrarás un apunte de Clustering en R, del libro `An Introduction to Clustering with R` de los autores `Paolo Giordani`,
+En este [R notebook](https://bastian951.github.io/ClusteringR). encontrarás un apunte de Clustering en R, del libro `An Introduction to Clustering with R` de los autores `Paolo Giordani`,
 `Maria Brigida Ferraro` y `Francesca Martella` de la editorial `Springer`. Vease <https://www.springer.com/gp/book/9789811305528>.
 
 ![](./img/logo.jpg)
