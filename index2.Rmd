@@ -1,5 +1,0 @@
----
-title: "My cats have a website!"
----
-
-This is John.
