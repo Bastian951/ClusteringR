@@ -1,15 +1,37 @@
 ---
-title: "My cats have a website!"
+title: "Introducción"
 ---
 
-This is John.
+El análisis <span style="color:blue">Cluster</span> (Clustering) comprende una larga clase de métodos con el objetivo de descubrir grupos significantes en los datos.
+El propósito es identificar $k$ grupos con ($k << n$) tal que 
 
-<img src="files/john.jpg" style="width:50%">
 
-This is Pete.
+<div class="alert alert-dismissible alert-info">
+1. Todo grupo contenga al menos 1 elemento
 
-<img src="files/pete.jpg" style="width:50%">
+2. Grupos disjuntos.
+</div>
 
-They are brothers!
 
-<img src="files/brother_kitties.jpg" style="width:50%">
+
+Lo anterior define una partición de $n$ unidades en $k$ grupos. Un grupo es significante si sus unidades son similares.
+
+Uno de los problemas es que no tenemos conocimiento a priori de la existencia y del numero de grupos. De hecho los clusters son sugeridos
+de forma bastante natural por los datos siguiendo el supuesto implicito de que existe algun tipo de homogeneidad y separación en el conjunto de datos
+
+Existen tres puntos importantes:
+
+-  El primero es la elección de las variables a considerar para los propositos de clustering.
+- El segundo es el preprocesamiento de los datos.
+- El tercero es la medida de similaridad o disimilaridad. Esta dependera del problema.
+
+Generalmente se pueden realizar varios analisis cluster para ver y comparar resultados. 
+
+Los métodos de agrupación que pertenecen al enfoque estándar se pueden dividir en métodos jerárquicos y no jerárquicos.
+
+Metodos no jerarquicos descubren la mejor partición de $n$ unidades en $k$ clusters de acuerdo a la minimización de una función de costos.
+Por lo tanto, solo se obtiene una partición.
+
+Los metodos jerarquicos producen una serie de particiones donde en cada paso o dos grupos se fusionan (agrupamiento jerárquico aglomerativo) o un grupo se divide en dos grupos (agrupamiento jerárquico divisivo) de acuerdo con un criterio dado 
+
+Los metodos jerarquicos se denominan clusters rigidos. Los clusters basados en modelos o fuzzy se dicen suaves.
