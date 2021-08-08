@@ -11,7 +11,7 @@
 
 
 
-<title>My cats have a website!</title>
+<title>Clustering Jerarquico</title>
 
 <script src="site_libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -269,12 +269,199 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">My cats have a website!</h1>
+<h1 class="title toc-ignore">Clustering Jerarquico</h1>
 
 </div>
 
 
-<p>This is John.</p>
+<p>El clustering jerarquico no conduce a una sola partición con un numero determinado de agrupaciones, si no que produce una serie de particiones obtenidas en diferentes pasos.</p>
+<p>Este tipo de clustering necesita una matriz de disimilitud</p>
+<div id="distancias" class="section level2">
+<h2>Distancias</h2>
+<p>Sea <span class="math inline">\(X\)</span> una matriz de dimensión $np $. Los valores que toma la matriz pueden ser cuantitativos o cualitativos.</p>
+<p>Primero veamos el caso cuantitativo.</p>
+<p>En <code>R</code> podemos encontrar implementadas varias distancias. Por ejemplo</p>
+<div id="distancia-euclideana" class="section level3">
+<h3>Distancia Euclideana</h3>
+<p><span class="math display">\[d(\mathbb{x_i},\mathbb{x_{i&#39;}}) = \sqrt{\sum_{j=1}^p(x_{ij}-x_{i&#39;j})^2}\]</span> caso particular de la distancia Minkowski de orden <span class="math inline">\(q\)</span></p>
+</div>
+<div id="distancia-minkoswki" class="section level3">
+<h3>Distancia Minkoswki</h3>
+<p><span class="math display">\[d_M^q(\mathbb{x_i},\mathbb{x_{i&#39;}}) = \left(\sum_{j=1}^p\vert x_{ij}-x_{i&#39;j}\vert^q\right)^{1/q}\]</span> Podemos encontrar la distancia euclideana en <code>R</code> como <code>dist</code> en el paquete <code>stats</code> y como <code>daisy</code> paquete <code>cluster</code>.</p>
+<pre class="r"><code>library(stats)
+
+X &lt;- matrix (c(0.5,0.0,1.5,0.5,1.0,1.5), ncol=2)
+plot(X,type=&quot;n&quot;,xlim = c(-0.5,2.5), ylim = c(-1,3) , xlab = &quot;Eje x&quot; , ylab = &quot;Eje y&quot;)
+text(X[,1] , X[,2] , c(&quot;A&quot;,&quot;B&quot;,&quot;C&quot;))</code></pre>
+<p><img src="jerarquico_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<pre class="r"><code>dist(X,diag =FALSE)</code></pre>
+<pre><code>##           1         2
+## 2 0.7071068          
+## 3 1.4142136 1.5811388</code></pre>
+<pre class="r"><code>library(cluster)
+
+daisy(X, metric=&quot;euclidean&quot;)</code></pre>
+<pre><code>## Dissimilarities :
+##           1         2
+## 2 0.7071068          
+## 3 1.4142136 1.5811388
+## 
+## Metric :  euclidean 
+## Number of objects : 3</code></pre>
+<ul>
+<li><p>Mediante la libreria <code>dist</code> podemos calcular la distancia euclideana, minkowski y manhattan (minkowski con <span class="math inline">\(q=1\)</span>).</p></li>
+<li><p>Mediante la libreria <code>daisy</code> podemos calcular la distancia euclideana y manhattan.</p></li>
+</ul>
+</div>
+<div id="ejemplo-con-minkowski-q3" class="section level3">
+<h3>Ejemplo con minkowski, q=3</h3>
+<pre class="r"><code>dist(X,method=&quot;minkowski&quot;,p=3)</code></pre>
+<pre><code>##           1         2
+## 2 0.6299605          
+## 3 1.2599210 1.5182945</code></pre>
+<p><strong>Observación:</strong> Mediante daisy podemos estandarizar los datos (Si quisieramos hacer lo mismo con dist, tendriamos que estandarizar antes)</p>
+</div>
+</div>
+<div id="distancia-de-mahalanobis" class="section level2">
+<h2>Distancia de Mahalanobis</h2>
+<p><span class="math display">\[d_M(\mathbb{x_i},\mathbb{x_{i&#39;}})=\sqrt{(x_i-x_{i&#39;})^T\Sigma^{-1}(x_i-x_{i&#39;})}\]</span></p>
+<p>La distancia de Mahalanobis no está incluida en ninguno de estos paquetes. El paquete <code>stats</code> contiene la función <code>mahalanobis</code> la cual computa el cuadrado de la distancia de mahalanobis entre el vector <span class="math inline">\(x_i\)</span> y un vector <span class="math inline">\(x_{i&#39;}\)</span>. Es decir, no obtenemos una matriz de disimilitud.</p>
+<div id="ejemplo-función-mahalanobis-paquete-stats" class="section level3">
+<h3>Ejemplo función mahalanobis paquete stats</h3>
+<pre class="r"><code>mahalanobis(X,center=c(0.5,0.5),cov=var(X))</code></pre>
+<pre><code>## [1] 0 4 4</code></pre>
+<p>Otro paquete que contiene la función mahalanobis es <code>mahalanobis.dist</code> del paquete <code>StatMatch</code>. Esta función si nos retorna una matriz de similitud</p>
+<pre class="r"><code>library(StatMatch)</code></pre>
+<pre><code>## Loading required package: proxy</code></pre>
+<pre><code>## 
+## Attaching package: &#39;proxy&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     as.dist, dist</code></pre>
+<pre><code>## The following object is masked from &#39;package:base&#39;:
+## 
+##     as.matrix</code></pre>
+<pre><code>## Loading required package: survey</code></pre>
+<pre><code>## Loading required package: grid</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## 
+## Attaching package: &#39;survey&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     dotchart</code></pre>
+<pre><code>## Loading required package: lpSolve</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre class="r"><code>mahalanobis.dist(X,vc=var(X))</code></pre>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    0    2    2
+## [2,]    2    0    2
+## [3,]    2    2    0</code></pre>
+</div>
+</div>
+<div id="paquete-distances" class="section level2">
+<h2>Paquete distances</h2>
+<p>El paquete <code>distances</code> contiene la distancia euclideana y la de mahalanobis.</p>
+<div id="ejemplo-distancia-de-mahalanobis-paquete-distances" class="section level3">
+<h3>Ejemplo distancia de mahalanobis paquete distances</h3>
+<pre class="r"><code>library(distances)
+distances(X, normalize = &quot;mahalanobize&quot;)</code></pre>
+<pre><code>##   1 2 3
+## 1 0 2 2
+## 2 2 0 2
+## 3 2 2 0</code></pre>
+</div>
+<div id="paquete-philentropy" class="section level3">
+<h3>Paquete philentropy</h3>
+<p>Este paquete contiene una función llamada distance, la cual contiene una gran variedad de distancias y medidas de similaridad.</p>
+<div id="familia-l_p" class="section level4">
+<h4><strong>Familia <span class="math inline">\(L_p\)</span></strong></h4>
+<ul>
+<li>Euclideana</li>
+<li>Manhattan</li>
+<li>Minkoswki</li>
+<li>Chebyshev <span class="math display">\[d = max\Vert P_i - Q_i \vert\]</span></li>
+</ul>
+</div>
+<div id="familia-l_1" class="section level4">
+<h4><strong>Familia <span class="math inline">\(L_1\)</span></strong></h4>
+<ul>
+<li><p>Sorensen <span class="math display">\[d = ∑ | P_i - Q_i | / ∑ (P_i + Q_i)\]</span></p></li>
+<li><p>Gower <span class="math display">\[d = 1/d * ∑ | P_i - Q_i |\]</span></p></li>
+<li><p>Soergel <span class="math display">\[d = ∑ | P_i - Q_i | / ∑ max(P_i , Q_i)\]</span></p></li>
+<li><p>Kulczynski <span class="math display">\[d = ∑ | P_i - Q_i | / ∑ min(P_i , Q_i)\]</span></p></li>
+<li><p>Canberra <span class="math display">\[d = ∑ | P_i - Q_i | / (P_i + Q_i)\]</span></p></li>
+<li><p>Lorentzian <span class="math display">\[d = ∑ ln(1 + | P_i - Q_i |)\]</span></p></li>
+</ul>
+</div>
+<div id="familia-intersección" class="section level4">
+<h4><strong>Familia intersección</strong></h4>
+<ul>
+<li><p>Intersection <span class="math display">\[s = ∑ min(P_i , Q_i)\]</span></p></li>
+<li><p>Non-Intersection <span class="math display">\[d = 1 - ∑ min(P_i , Q_i)\]</span></p></li>
+<li><p>Wave Hedges <span class="math display">\[d = ∑ | P_i - Q_i | / max(P_i , Q_i)\]</span></p></li>
+<li><p>Czekanowski <span class="math display">\[d = ∑ | P_i - Q_i | / ∑ | P_i + Q_i |\]</span></p></li>
+<li><p>Motyka <span class="math display">\[d = ∑ min(P_i , Q_i) / (P_i + Q_i)\]</span></p></li>
+<li><p>Kulczynski s <span class="math display">\[d = 1 / ∑ | P_i - Q_i | / ∑ min(P_i , Q_i)\]</span></p></li>
+<li><p>Tanimoto <span class="math display">\[d = ∑ (max(P_i , Q_i) - min(P_i , Q_i)) / ∑ max(P_i , Q_i) \]</span> equivalente a Soergel</p></li>
+<li><p>Ruzicka <span class="math display">\[s = ∑ min(P_i , Q_i) / ∑ max(P_i , Q_i)\]</span> equivalente a 1 - Tanimoto = 1 - Soergel</p></li>
+</ul>
+</div>
+<div id="familia-producto-interno" class="section level4">
+<h4>Familia producto interno</h4>
+<ul>
+<li><p>Inner Product <span class="math display">\[s = ∑ P_i * Q_i\]</span></p></li>
+<li><p>Harmonic mean <span class="math display">\[s = 2 * ∑ (P_i * Q_i) / (P_i + Q_i)\]</span></p></li>
+<li><p>Cosine <span class="math display">\[s = ∑ (P_i * Q_i) / \sqrt{∑ P_i^2} * \sqrt{∑ Q_i^2}\]</span></p></li>
+<li><p>Kumar-Hassebrook (PCE) <span class="math display">\[s = ∑ (P_i * Q_i) / (∑ P_i^2 + ∑ Q_i^2 - ∑ (P_i * Q_i))\]</span></p></li>
+<li><p>Jaccard <span class="math display">\[d = 1 - ∑ (P_i * Q_i) / (∑ P_i^2 + ∑ Q_i^2 - ∑ (P_i * Q_i))\]</span> equivalente a 1 - Kumar-Hassebrook</p></li>
+<li><p>Dice <span class="math display">\[d = ∑ (P_i - Q_i)^2 / (∑ P_i^2 + ∑ Q_i^2)\]</span></p></li>
+</ul>
+</div>
+<div id="squared-chord-family" class="section level4">
+<h4>Squared-chord family</h4>
+<ul>
+<li><p>Fidelity <span class="math display">\[s = ∑ \sqrt{P_i * Q_i}\]</span></p></li>
+<li><p>Bhattacharyya <span class="math display">\[d = - ln ∑ sqrt(P_i * Q_i)\]</span></p></li>
+<li><p>Hellinger <span class="math display">\[d = 2 * \sqrt( 1 - ∑ \sqrt{P_i * Q_i})\]</span></p></li>
+<li><p>Matusita <span class="math display">\[d = sqrt( 2 - 2 * ∑ \sqrt{P_i * Q_i})\]</span></p></li>
+<li><p>Squared-chord <span class="math display">\[d = ∑ ( \sqrt{P_i} - \sqrt{Q_i} )^2\]</span></p></li>
+</ul>
+</div>
+<div id="squared-l_2-family-x2-squared-family" class="section level4">
+<h4>Squared L_2 family (X^2 squared family)</h4>
+<ul>
+<li><p>Squared Euclidean <span class="math display">\[d = ∑ ( P_i - Q_i )^2\]</span></p></li>
+<li><p>Pearson X^2 <span class="math display">\[d = ∑ ( (P_i - Q_i )^2 / Q_i )\]</span></p></li>
+<li><p>Neyman X^2 <span class="math display">\[d = ∑ ( (P_i - Q_i )^2 / P_i )\]</span></p></li>
+<li><p>Squared X^2 <span class="math display">\[d = ∑ ( (P_i - Q_i )^2 / (P_i + Q_i) )\]</span></p></li>
+<li><p>Probabilistic Symmetric X^2 <span class="math display">\[d = 2 * ∑ ( (P_i - Q_i )^2 / (P_i + Q_i) )\]</span></p></li>
+<li><p>Divergence : X^2 <span class="math display">\[d = 2 * ∑ ( (P_i - Q_i )^2 / (P_i + Q_i)^2 )\]</span></p></li>
+<li><p>Clark <span class="math display">\[d = sqrt ( ∑ (| P_i - Q_i | / (P_i + Q_i))^2 )\]</span></p></li>
+<li><p>Additive Symmetric X^2 <span class="math display">\[d = ∑ ( ((P_i - Q_i)^2 * (P_i + Q_i)) / (P_i * Q_i) )\]</span></p></li>
+</ul>
+</div>
+<div id="shannons-entropy-family" class="section level4">
+<h4>Shannon’s entropy family</h4>
+<ul>
+<li><p>Kullback-Leibler <span class="math display">\[d = ∑ P_i * log(P_i / Q_i)\]</span></p></li>
+<li><p>Jeffreys <span class="math display">\[d = ∑ (P_i - Q_i) * log(P_i / Q_i)\]</span></p></li>
+<li><p>K divergence <span class="math display">\[d = ∑ P_i * log(2 * P_i / P_i + Q_i)\]</span></p></li>
+<li><p>Topsoe <span class="math display">\[d = ∑ ( P_i * log(2 * P_i / P_i + Q_i) ) + ( Q_i * log(2 * Q_i / P_i + Q_i) )\]</span></p></li>
+<li><p>Jensen-Shannon <span class="math display">\[d = 0.5 * ( ∑ P_i * log(2 * P_i / P_i + Q_i) + ∑ Q_i * log(2 * Q_i / P_i + Q_i))\]</span></p></li>
+<li><p>Jensen difference <span class="math display">\[d = ∑ ( (P_i * log(P_i) + Q_i * log(Q_i) / 2) - (P_i + Q_i / 2) * log(P_i + Q_i / 2) )\]</span></p></li>
+</ul>
+</div>
+<div id="combinations" class="section level4">
+<h4>Combinations</h4>
+<ul>
+<li><p>Taneja <span class="math display">\[d = ∑ ( P_i + Q_i / 2) * log( P_i + Q_i / ( 2 * sqrt( P_i * Q_i)) )\]</span></p></li>
+<li><p>Kumar-Johnson <span class="math display">\[d = ∑ (P_i^2 - Q_i^2)^2 / 2 * (P_i * Q_i)^1.5\]</span></p></li>
+<li><p>Avg(L_1, L_n) <span class="math display">\[d = ∑ | P_i - Q_i| + max{ | P_i - Q_i |} / 2\]</span></p></li>
+</ul>
+</div>
+</div>
+</div>
 
 
 
