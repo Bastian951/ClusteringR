@@ -1,5 +1,241 @@
 ---
-title: "My cats have a website!"
+title: "**Clustering Jerarquico**"
 ---
 
-This is John.
+El clustering jerarquico no conduce a una sola partición con un numero determinado de agrupaciones, si no que produce una serie de particiones obtenidas en diferentes pasos. 
+
+Este tipo de clustering necesita una matriz de disimilitud
+
+## **Distancias**
+
+Sea $X$ una matriz de dimensión $n \times p$. Los valores que toma la matriz pueden ser cuantitativos o cualitativos. 
+
+Primero veamos el caso cuantitativo.  
+
+En `R` podemos encontrar implementadas varias distancias. Por ejemplo 
+
+## **Distancia Euclideana**
+
+$$d(\mathbb{x_i},\mathbb{x_{i'}}) = \sqrt{\sum_{j=1}^p(x_{ij}-x_{i'j})^2}$$
+caso particular de la distancia Minkowski de orden $q$
+
+## **Distancia Minkoswki**
+
+
+$$d_M^q(\mathbb{x_i},\mathbb{x_{i'}}) = \left(\sum_{j=1}^p\vert x_{ij}-x_{i'j}\vert^q\right)^{1/q}$$
+Podemos encontrar la distancia euclideana en `R` como `dist` en el paquete `stats` y como `daisy` paquete `cluster`.
+
+```{r}
+library(stats)
+
+X <- matrix (c(0.5,0.0,1.5,0.5,1.0,1.5), ncol=2)
+plot(X,type="n",xlim = c(-0.5,2.5), ylim = c(-1,3) , xlab = "Eje x" , ylab = "Eje y")
+text(X[,1] , X[,2] , c("A","B","C"))
+dist(X,diag =FALSE)
+```
+
+```{r}
+library(cluster)
+
+daisy(X, metric="euclidean")
+```
+
+- Mediante la libreria `dist` podemos calcular la distancia euclideana, minkowski y manhattan (minkowski con $q=1$). 
+
+- Mediante la libreria `daisy` podemos calcular la distancia euclideana y manhattan. 
+
+### **Ejemplo con minkowski, q=3**
+
+```{r}
+dist(X,method="minkowski",p=3)
+```
+
+**Observación:** Mediante daisy podemos estandarizar los datos (Si quisieramos hacer lo mismo con dist, tendriamos que estandarizar antes)
+
+## **Distancia de Mahalanobis**
+
+$$d_M(\mathbb{x_i},\mathbb{x_{i'}})=\sqrt{(x_i-x_{i'})^T\Sigma^{-1}(x_i-x_{i'})}$$
+
+La distancia de Mahalanobis no está incluida en ninguno de estos paquetes. El paquete `stats` contiene la función `mahalanobis` la cual computa el cuadrado de la distancia de mahalanobis entre el vector $x_i$ y un vector $x_{i'}$. Es decir, no obtenemos una matriz de disimilitud. 
+
+### **Ejemplo función mahalanobis paquete stats**
+
+
+
+```{r}
+mahalanobis(X,center=c(0.5,0.5),cov=var(X))
+```
+
+Otro paquete que contiene la función mahalanobis es `mahalanobis.dist` del paquete `StatMatch`. Esta función si nos retorna una matriz de similitud 
+
+```{r}
+library(StatMatch)
+mahalanobis.dist(X,vc=var(X))
+```
+## **Paquete distances**
+
+El paquete `distances` contiene la distancia euclideana y la de mahalanobis. 
+
+### **Ejemplo distancia de mahalanobis paquete distances**
+
+```{r}
+library(distances)
+distances(X, normalize = "mahalanobize")
+```
+## **Paquete philentropy**
+
+Este paquete contiene una función llamada distance, la cual contiene una gran variedad de distancias y medidas de similaridad.
+
+#### **Familia $L_p$**
+
+- Euclideana
+- Manhattan
+- Minkoswki
+- Chebyshev $$d = max\Vert P_i - Q_i \vert$$
+
+#### **Familia $L_1$**
+
+- Sorensen $$d = ∑ | P_i - Q_i | / ∑ (P_i + Q_i)$$
+- Gower $$d = 1/d * ∑ | P_i - Q_i |$$
+- Soergel $$d = ∑ | P_i - Q_i | / ∑ max(P_i , Q_i)$$
+
+- Kulczynski $$d = ∑ | P_i - Q_i | / ∑ min(P_i , Q_i)$$
+
+- Canberra $$d = ∑ | P_i - Q_i | / (P_i + Q_i)$$
+
+- Lorentzian $$d = ∑ ln(1 + | P_i - Q_i |)$$
+
+#### **Familia intersección**
+
+- Intersection $$s = ∑ min(P_i , Q_i)$$
+
+- Non-Intersection $$d = 1 - ∑ min(P_i , Q_i)$$
+
+- Wave Hedges $$d = ∑ | P_i - Q_i | / max(P_i , Q_i)$$
+
+- Czekanowski $$d = ∑ | P_i - Q_i | / ∑ | P_i + Q_i |$$
+
+- Motyka $$d = ∑ min(P_i , Q_i) / (P_i + Q_i)$$
+
+- Kulczynski s $$d = 1 / ∑ | P_i - Q_i | / ∑ min(P_i , Q_i)$$
+
+- Tanimoto $$d = ∑ (max(P_i , Q_i) - min(P_i , Q_i)) / ∑ max(P_i , Q_i) $$ equivalente a Soergel
+
+- Ruzicka $$s = ∑ min(P_i , Q_i) / ∑ max(P_i , Q_i)$$ equivalente a 1 - Tanimoto = 1 - Soergel
+
+#### **Familia producto interno**
+
+- Inner Product $$s = ∑ P_i * Q_i$$
+
+- Harmonic mean $$s = 2 * ∑ (P_i * Q_i) / (P_i + Q_i)$$
+
+- Cosine  $$s = ∑ (P_i * Q_i) / \sqrt{∑ P_i^2} * \sqrt{∑ Q_i^2}$$
+
+- Kumar-Hassebrook (PCE) $$s = ∑ (P_i * Q_i) / (∑ P_i^2 + ∑ Q_i^2 - ∑ (P_i * Q_i))$$
+
+- Jaccard $$d = 1 - ∑ (P_i * Q_i) / (∑ P_i^2 + ∑ Q_i^2 - ∑ (P_i * Q_i))$$  equivalente a 1 - Kumar-Hassebrook
+
+- Dice $$d = ∑ (P_i - Q_i)^2 / (∑ P_i^2 + ∑ Q_i^2)$$
+
+#### **Squared-chord family**
+
+- Fidelity $$s = ∑ \sqrt{P_i * Q_i}$$
+
+- Bhattacharyya $$d = - ln ∑ sqrt(P_i * Q_i)$$
+
+- Hellinger $$d = 2 * \sqrt( 1 - ∑ \sqrt{P_i * Q_i})$$
+
+- Matusita $$d = sqrt( 2 - 2 * ∑ \sqrt{P_i * Q_i})$$
+
+- Squared-chord $$d = ∑ ( \sqrt{P_i} - \sqrt{Q_i} )^2$$
+
+#### **Squared L_2 family (X^2 squared family)**
+
+- Squared Euclidean $$d = ∑ ( P_i - Q_i )^2$$
+
+- Pearson X^2 $$d = ∑ ( (P_i - Q_i )^2 / Q_i )$$
+
+- Neyman X^2 $$d = ∑ ( (P_i - Q_i )^2 / P_i )$$
+
+- Squared X^2 $$d = ∑ ( (P_i - Q_i )^2 / (P_i + Q_i) )$$
+
+- Probabilistic Symmetric X^2 $$d = 2 * ∑ ( (P_i - Q_i )^2 / (P_i + Q_i) )$$
+
+- Divergence : X^2 $$d = 2 * ∑ ( (P_i - Q_i )^2 / (P_i + Q_i)^2 )$$
+
+- Clark $$d = sqrt ( ∑ (| P_i - Q_i | / (P_i + Q_i))^2 )$$
+
+- Additive Symmetric X^2 $$d = ∑ ( ((P_i - Q_i)^2 * (P_i + Q_i)) / (P_i * Q_i) )$$
+
+#### **Shannon's entropy family**
+
+- Kullback-Leibler $$d = ∑ P_i * log(P_i / Q_i)$$
+
+- Jeffreys $$d = ∑ (P_i - Q_i) * log(P_i / Q_i)$$
+
+- K divergence $$d = ∑ P_i * log(2 * P_i / P_i + Q_i)$$
+
+- Topsoe $$d = ∑ ( P_i * log(2 * P_i / P_i + Q_i) ) + ( Q_i * log(2 * Q_i / P_i + Q_i) )$$
+
+- Jensen-Shannon $$d = 0.5 * ( ∑ P_i * log(2 * P_i / P_i + Q_i) + ∑ Q_i * log(2 * Q_i / P_i + Q_i))$$
+
+- Jensen difference $$d = ∑ ( (P_i * log(P_i) + Q_i * log(Q_i) / 2) - (P_i + Q_i / 2) * log(P_i + Q_i / 2) )$$
+
+#### **Combinations**
+
+- Taneja $$d = ∑ ( P_i + Q_i / 2) * log( P_i + Q_i / ( 2 * sqrt( P_i * Q_i)) )$$
+
+- Kumar-Johnson $$d = ∑ (P_i^2 - Q_i^2)^2 / 2 * (P_i * Q_i)^1.5$$
+
+- Avg(L_1, L_n) $$d = ∑ | P_i - Q_i| + max{ | P_i - Q_i |} / 2$$
+
+Podemos encontrar todas las distancias con el siguiente comando
+
+```{r}
+library(philentropy)
+getDistMethods()
+```
+
+### **Ejemplo paquete philentropy**
+
+```{r}
+distance(X, method="neyman")
+```
+
+
+Hasta el momento hemos visto distancias para variables cuantitativas. Si los datos son mixtos se puede usar la distancia Gower. Esta distancia se comporta de manera distinta para variables cualitativas, intervalares, razón u ordinales. 
+
+## **Distancia Gower**
+
+$$s_{gower}(x,y) = \frac{\sum_{k=1}^d w(x_k,y_k)s(x_k,y_k)}{\sum_{k=1}^d w(x_k,y_k)}$$
+
+con $w(x_k,y_k) = 1$ si los valores pueden ser comparados. Si ambos vectores son cuantitativos $$s = 1 - \frac{|x_k-y_k|}{\max x_k - min x_k}$$
+
+Para variables cualitativas $s(x_k,y_k)=1$ si $x_k=y_k$. 
+
+Esta distancia está implementada en la función daisy del paquete cluster
+
+### **Ejemplo distancia Gower en paquete cluster**
+
+```{r}
+Alturas = data.frame("altura"=c(155,165,165,170),"sexo"=c("M","F","F","M"))
+Alturas$sexo= as.factor(Alturas$sexo)
+daisy(Alturas,metric="gower")
+```
+Tambien podemos encontrar la distancia Gower en el paquete StatMatch, la función se llama gower.dist
+
+### **Distancia Gower en el paquete StatMatch**
+
+```{r}
+gower.dist(Alturas)
+```
+
+# **Resumen sección distancias:**
+
+En esta sección vimos 4 librerias de R
+
+- stats (euclideana, minkowski y manhattan)
+- cluster (euclideana, manhattan, gower)
+- StatMatch (mahalanobis, gower)
+- distances (mahalanobis)
+- philentropy (Varias)

@@ -4,10 +4,12 @@ navbar:
   left:
     - text: "Inicio"
       href: index.html
-    - text: "Introducción"
-      href: intro.html
-    - text: "Cluster Jerarquico"
-      href: jerarquico.html
+    - text: "Cluster jerarquico"
+      menu:
+        - text: "Introducción"
+          href: intro.html
+        - text: "Cluster Jerarquico"
+          href: jerarquico.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/
