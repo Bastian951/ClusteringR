@@ -6,3 +6,91 @@ title: "Clustering Jerárquico Aglomerativo"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+El clustering jerárquico aglomerativo consiste en una serie de métodos que en cada paso unen los dos clusters mas similares. Dada una matriz de distancias $D_n$ la cual contiene distancias de $n$ clusters (inicialmente singletons) se deben seguir los siguientes pasos:
+
+1. De acuerdo a $D_n$ unimos dos unidades (clusters singleton) con la minima distancia en un nuevo cluster. Esto lleva a una partición con $n-1$ clusters.
+
+2. Computar la nueva matriz de distancia $D_{n-1}$ de tamaño $(n-1) \times (n-1)$. Las distancias entre clusters singleton, se heredan desde la matriz original. Hay diversas alternativas para calcular la distancia entre los nuevos clusters y los restantes. (La elección distingue los métodos aglomerativos)
+
+3. Unir 2 clusters con minima distancia usando la matriz de $D_{n-1}$. Dejando una partición de $n-2$ clusters. 
+
+4. Repetir 2 y 3 hasta llegar a $n=2$ y obtener una partición trivial. 
+
+El punto crucial en el el método aglomerativo consiste en la distancia entre la fusión de 2 clusters y otros. Por ejemplo la distancia entre la fusión de $C_1$ y $C_2$ que denotaremos $C_{1,2}$ con el cluster $C_3$. Estos metodos está definidos por la formula **Lance-Williams**
+
+$$d(C_{1,2},C_3) = \alpha_1 d(C_1,C_3)+\alpha_2 d(C_2,C_3) + \beta d(C_1,C_2)+\gamma \vert d(C_1,C_3)-d(C_2,C_3)\vert$$
+
+dependiendo de los valores $\alpha_1, \alpha_2, \beta, \gamma$ se define la clase de método aglomerativo. 
+
+## **Métodos**
+
+### **Single Linkage**
+
+Consiste en la elección $\alpha_1 = \alpha_2 = 0.5$, $\beta=0$ y $\gamma = -0.5$. Obteniendo 
+
+$$d(C_{1},C_2) =\min_{c_1 \in C_1, c_2 \in C_2} d(c_1,c_2)$$
+
+### **Complete Linkage**
+
+Consiste en la elección $\alpha_1 = \alpha_2 = \gamma = 0.5$, $\beta=0$ 
+
+$$d(C_{1},C_2) =\max_{c_1 \in C_1, c_2 \in C_2} d(c_1,c_2)$$
+
+
+### **Average Linkage**
+
+Consiste en la elección $\alpha_1 = \frac{\vert C_1\vert}{\vert C_1\vert + \vert C_2\vert}$, $\alpha_1 = \frac{\vert C_2\vert}{\vert C_1\vert + \vert C_2\vert}$, $\beta=0$ 
+
+Obteniendo 
+
+$$d(C_{1},C_2) =\frac{\sum_{c_1\in C_1}\sum_{c_2\in C_2} d(c_1,c_2)}{\vert C_1 \vert \vert C_2\vert}$$
+
+### **Método Ward's**
+
+Consiste en la elección $\alpha_1 = \frac{\vert C_1\vert+\vert C_3\vert}{\vert C_1\vert + \vert C_2\vert+\vert C_3\vert}$, $\alpha_2 = \frac{\vert C_2\vert+\vert C_3\vert}{\vert C_1\vert + \vert C_2\vert+\vert C_3\vert}$, $\beta=\frac{-\vert C_3\vert}{\vert C_1\vert + \vert C_2\vert+\vert C_3\vert}$ 
+
+Obteniendo 
+
+$$d(C_{1},C_2) = d(\bar{x}_{C_1},\bar{x}_{C_2})$$
+donde $\bar{x}_{C_i} = \bar{C_i}$ con $i=1,2$
+
+En el siguiente link podemos encontrar un ejemplo numérico 
+
+https://people.revoledu.com/kardi/tutorial/Clustering/Numerical%20Example.htm
+
+## **Paquetes de R**
+
+- En el paquete `stats` podemos encontrar la función `hclust`
+- En el paquete `cluster`podemos encontrar la función `agnes`
+
+### **Métodos en hclust**
+
+- **Single linkage method**: "single"
+- **Average linkage method**: "average"
+- **complete linkage method**: "complete"
+- **Variant of Ward’s method**: "ward.D"
+- **Ward’s method**: "ward.D2"
+- **McQuitty method**: "mcquitty"
+- **Median method**: "median"
+- **Centroid method**: "centroid"
+
+### **Métodos en agnes**
+
+
+- **Single linkage method**: "single"
+- **Average linkage method**: "average"
+- **Complete linkage method**: "complete"
+- **Ward’s method**: "ward"
+- **McQuitty method**: "weighted"
+- **Variant of the average linkage** "gaverage"
+
+En la página 5 probamos estas librerias en R
+
+
+
+
+
+
+
+
