@@ -11,7 +11,7 @@
 
 
 
-<title>Introducción</title>
+<title>Clustering Jerárquico Aglomerativo</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -278,64 +278,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Introducción</h1>
-
-</div>
-
-
-<p>El análisis <span style="color:blue">Cluster</span> (Clustering) comprende una larga clase de métodos con el objetivo de descubrir grupos significantes en los datos. El propósito es identificar <span class="math inline">\(k\)</span> grupos con (<span class="math inline">\(k &lt;&lt; n\)</span>) tal que</p>
-<div class="alert alert-dismissible alert-info">
-<ol style="list-style-type: decimal">
-<li><p>Todo grupo contenga al menos 1 elemento</p></li>
-<li><p>Grupos disjuntos.</p></li>
-</ol>
-</div>
-<p>Lo anterior define una partición de <span class="math inline">\(n\)</span> unidades en <span class="math inline">\(k\)</span> grupos. Un grupo es significante si sus unidades son similares.</p>
-<p>Uno de los problemas es que no tenemos conocimiento a priori de la existencia y del numero de grupos. De hecho los clusters son sugeridos de forma bastante natural por los datos siguiendo el supuesto implicito de que existe algun tipo de homogeneidad y separación en el conjunto de datos</p>
-<p>Existen tres puntos importantes:</p>
-<ul>
-<li>El primero es la elección de las variables a considerar para los propositos de clustering.</li>
-<li>El segundo es el preprocesamiento de los datos.</li>
-<li>El tercero es la medida de similaridad o disimilaridad. Esta dependera del problema.</li>
-</ul>
-<p>Generalmente se pueden realizar varios analisis cluster para ver y comparar resultados.</p>
-<p>Los métodos de agrupación que pertenecen al enfoque estándar se pueden dividir en métodos jerárquicos y no jerárquicos.</p>
-<p>Metodos no jerarquicos descubren la mejor partición de <span class="math inline">\(n\)</span> unidades en <span class="math inline">\(k\)</span> clusters de acuerdo a la minimización de una función de costos. Por lo tanto, solo se obtiene una partición.</p>
-<p>Los metodos jerarquicos producen una serie de particiones donde en cada paso o dos grupos se fusionan (agrupamiento jerárquico aglomerativo) o un grupo se divide en dos grupos (agrupamiento jerárquico divisivo) de acuerdo con un criterio dado</p>
-<p>Los metodos jerarquicos se denominan clusters rigidos. Los clusters basados en modelos o fuzzy se dicen suaves.</p>
-
-<div>
-  <ul class="pagination">
-    <li class="page-item disabled">
-      <a class="page-link" href="#">&laquo;</a>
-    </li>
-    <li class="page-item active">
-      <a class="page-link">1</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" href="/ClusteringR/jerarquico.html">2</a>
-    </li>
-       <li class="page-item">
-      <a class="page-link" href="/ClusteringR/aglomerativo.html">3</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" href="/ClusteringR/divisivo.html">4</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" href="/ClusteringR/agnes.html">5</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" href="/ClusteringR/funciones.html">6</a>
-    </li>
-    <li class="page-item">
-      <a class="page-link" href="#">&raquo;</a>
-    </li>
-  </ul>
-</div>
-
-
-
-
+<h1 class="title toc-ignore">Clustering Jerárquico Aglomerativo</h1>
 
 </div>
 
@@ -343,6 +286,9 @@ $(document).ready(function () {
 
 
 
+
+
+</div>
 
 <script>
 
