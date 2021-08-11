@@ -1,0 +1,320 @@
+---
+title: "**Datos mixtos**"
+---
+
+## **Caso 1: Hoteles**
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Ahora utilizaremos el dataset `lasvegas.trip` del paquete `datasetsICR`. Este dataset contiene datos de 21 hoteles con 9 caracteristicas. Estas caracteristicas son cuantitativas y cualitativas 
+
+```{r}
+library(datasetsICR)
+data ("lasvegas.trip")
+str(lasvegas.trip)
+```
+```{r}
+library(cluster)
+D <- daisy(lasvegas.trip[,-3],metric="gower")
+```
+
+```{r}
+res.agnes <- agnes(D, diss = TRUE, method = "complete")
+```
+
+```{r}
+res.agnes$order.lab <- rep (" " , 21)
+plot(res.agnes, hang = -0.1 , which.plots = 2 , main = " ")
+```
+
+```{r}
+cluster.agnes <- cutree(res.agnes , k = 2)
+table(cluster.agnes)
+```
+
+```{r}
+res.hclust <- hclust(D)
+cluster.hclust <- cutree(res.hclust , k = 2)
+res.hclust$order.lab <- rep (" " , 21)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+library(mclust)
+adjustedRandIndex(cluster.hclust, cluster.agnes)
+```
+
+
+
+```{r}
+library("ape")
+colors = c("green", "black")
+plot(as.phylo(res.hclust), tip.color = colors[cluster.hclust])
+```
+
+
+Podemos calcular los promedios por cluster para el score, la cantidad de estrellas y número de habitaciones
+
+```{r}
+k <- 2
+lapply(X=1:k, FUN=function(nc) apply(lasvegas.trip[cluster.agnes == nc , 1:3], 2 , mean ) )
+```
+
+Notemos que no hay una gran diferencia en el score, pero si en la cantidad de estrellas de los hoteles y del numero de habitaciones. Esto se debe a que el score es subjetivo debido al usuario. Para las variables categoricas podemos plotear un barplot y podemos agregar el p-value de un test $\chi^2$ (El test $\chi^2$ tiene como hipótesis nula que las columnas y las filas de la tabla de contingencia son independientes, en este caso nos referimos a que (SI,NO) es independiente de (CLUSTER 1, CLUSTER 2))
+
+
+```{r message=FALSE, warning=FALSE}
+par(mfrow=c(3 , 2))
+for(j in 4: dim(lasvegas.trip)[2]){
+
+  counts <- table(lasvegas.trip[,j],cluster.agnes)
+  barplot(counts, main=names(lasvegas.trip)[j], names.arg = paste("Clus. ", colnames(counts)) ,
+          xlab =round(chisq.test(counts)$p.value , 2), col = c("darkblue", "red"),
+          legend =rownames(counts))
+}
+```
+
+Notemos que se obtuvieron p-values cercanos a 1 y cercanos a 0.  Los valores cercanos a 0 indican que es poco probable que la diferencia observada se deba al azar. Los valores cercanos a 1 sugieren que no hay diferencia entre los grupos, salvo que se deba al azar. 
+
+## **Caso 2: Banderas**
+
+El dataset `flags` del paquete `datasetsICR` contiene 194 banderas con 29 características, algunas de ellas cualitativas y otras cuantitativas. 
+
+```{r}
+data("flags")
+str(flags)
+```
+
+Las últimas 23 variables son características fisicas de las banderas, por lo que nos enfocaremos en estas. De estas 23 variables, 8 de estas son cuantitativas y el resto son cualitativas. Debido a que tenemos variables cualitativas utilizamos la distancia gower
+
+```{r message=FALSE, warning=FALSE}
+D.flags <- daisy(flags[,7:ncol(flags)], metric = "gower")
+```
+
+
+Aplicaremos 3 algoritmos aglomerativos (single, average y complete)  para luego comparar
+
+
+```{r}
+res.single <- hclust(d=D.flags, method = "single")
+res.average <-hclust(d=D.flags, method = "average")
+res.complete <-hclust(d=D.flags, method = "complete")
+```
+
+
+Desde los gráficos podemos ver que el método single cae en el efecto cadena. Por lo que nos enfocaremos en los otros dos métodos.  
+
+```{r}
+par(mfrow=c(3 , 1))
+plot(res.single, labels = FALSE , main = " Single" )
+plot(res.average , labels = FALSE , main = "Average")
+plot(res.complete , labels = FALSE , main = " Complete" )
+```
+
+Desde el método average podemos en la altura aproximada de 0.30 podemos ver tres clusters grandes y algunos clusters pequeños, por lo que podemos aproximar a 3 clusters. 
+
+Mediante la función cutree también podemos cortar el arbol mediante la altura. Notemos que cortando en $h=0.32$ encontramos 8 clusters, pero solo 3 son grandes
+
+```{r}
+cl.ave <- cutree(res.average , h = 0.32)
+table(cl.ave)
+```
+
+Por lo que podemos mandar estos clusters atípicos a un cluster 0
+
+```{r}
+cl.ave[cl.ave > 3] <- 0
+table(cl.ave)
+```
+
+
+Desde el método complete es claro que hay 3 clusters. 
+
+```{r}
+cl.com <- cutree(res.complete , k=3)
+table(cl.com)
+```
+
+Ahora comparamos los modelos para elegir el mejor. Primero comparemos ambos modelos entre sí con ICR. Luego utilizaremos la función `mapClass` del paquete `mclust`. Esta función toma dos valores $a$,$b$ como vectores y retorna $aTxb$ y $bTxa$ (donde $x$ es el numero del cluster). La función retorna a que cluster de $b$ corresponde mas cercamente los valores de $a$  (para $aTxb$, análogo para $bTxa$)
+
+```{r}
+adjustedRandIndex(cl.com , cl.ave)
+```
+```{r}
+mapClass(cl.com , cl.ave )
+```
+
+Notamos que las dos soluciones parecen concordar entre sí, nos quedamos con el método complete linkage, por su simplicidad. 
+
+Ahora analizaremos la bondad del ajuste mediante el test $\chi^2$. Recordemos que la hipótesis nula del test es la independencia de los clusters 
+
+```{r warning=FALSE}
+table(cl.com, flags$landmass)
+chisq.test(cl.com , flags$landmass)$p.value
+```
+
+Debido a que el p-value es cercano a 0, los clusters son significantes para la variable landmass
+
+```{r warning=FALSE}
+table(cl.com, flags$language)
+chisq.test(cl.com , flags$language)$p.value
+```
+Debido a que el p-value es cercano a 0, los clusters son significantes para la variable language
+
+```{r warning=FALSE}
+table(cl.com ,flags$religion)
+chisq.test(cl.com, flags$religion)$p.value
+```
+
+Debido a que el p-value es cercano a 0, los clusters son significantes para la variable religion.
+
+Ahora solo nos queda estudiar los clusters. Notemos que el cluster 1 se caracteriza principalmente por ser de religión musulmana y étnica y sus países provienen de África y Asia. En este grupo, observamos el porcentaje más alto de países de lengua árabe. 
+
+Notamos que muchos países asiáticos dentro del cluster 1 son del área de Medio Oriente excepto China y Vietnam. 
+
+```{r}
+row.names(flags)[flags$landmass == "Asia" & cl.com == 1]
+```
+
+Por otro lado en el cluster 2 la mayoría de los paises asiáticos son del lejano oriente. La religión mas común es católica y otras cristianas, es el cluster con la mayor cantidad de países marxistas.
+
+```{r}
+row.names(flags)[flags$landmass == "Asia" & cl.com == 2]
+```
+
+El tercer cluster contiene mayoritariamente países de América del norte. La mayoría de las religiones son otras cristianas. El lenguaje predominante es el inglés. Sin embargo hay países asiaticos.
+
+```{r}
+row.names(flags)[flags$landmass == "Asia" & cl.com == 3]
+```
+
+Tambien podemos ver la distribución de los colores de las banderas en cada cluster.
+
+
+```{r}
+plot.data <- matrix(NA,nrow=3,ncol = 7)
+rownames(plot.data) <- c("Clus.1","Clus.2","Clus.3")
+colnames(plot.data) <-rep(NA,7)
+cn <- 0
+for(j in c(10:16)){
+  cn <- cn + 1
+  counts <- table(flags[,j],cl.com)
+  colnames(plot.data)[cn] <- names(flags)[j]
+  plot.data[,cn] <- prop.table(counts,2)[2,]*100
+}
+barplot(plot.data , col =gray.colors(3) ,
+border = " white " , beside = T ,legend = rownames( plot.data ) ,
+xlab = "colours" , ylab = "percentage" )
+```
+
+
+## **Caso 3: Encuesta profesores universitarios**
+
+El siguiente dataset `wiki4HE` del paquete `datasetsICR` contiene datos de una encuesta a 913 profesores universitarios sobre la persepción y el uso de wikipedia con fine didácticos. La encuesta contiene 53 variables. 
+
+
+```{r}
+data("wiki4HE" )
+str(wiki4HE)
+```
+Las primeras 10 variables son datos del entrevistado, por lo que no las consideraremos para el proceso de agrupamiento. Todas las variables toman valores en escala de Likert, es decir, toma los valores (1,2,3,4,5). Donde 1 es en desacuerdo/nunca y 5 es de acuerdo/siempre. Comúnmente en el análisis de datos se considera la escala de Likert como continua, bajo el supuesto de que hay una variable continua subyacente. 
+
+El dataset contiene datos faltantes rellenos con $?$, por lo que los llenamos con NA. 
+
+```{r warning=FALSE}
+wiki4HE[ wiki4HE== "?" ] <- NA
+as.numeric.factor<- function(x){as.numeric(levels(x))[x]}
+
+for(nc in 11:53){wiki4HE[,nc] <-as.numeric.factor(wiki4HE[,nc])}
+wiki4HE.all <- wiki4HE[complete.cases(wiki4HE[,11:53]),11:53]
+dim(wiki4HE.all)
+```
+
+
+Las variables están en la misma unidad de medida por lo que no las estandarizamos. 
+
+```{r}
+D.wiki  <- dist(wiki4HE.all)
+res.ward <- hclust(d=D.wiki, method= "ward.D2")
+plot(res.ward , labels= FALSE)
+```
+
+
+Al ser tantos datos el dendrograma se vuelve engorroso, pero podemos darnos una idea del numero de clusters. El dendrograma nos da una idea de elegir entre 1 y 4 clusters, sin embargo esta elección debe basarse en datos cualitativos y/o estadísticos.
+
+Existe una función llamada `rect.hclust` en el paquete `stats` que nos permite encerrar en un rectángulo los clusters (solo para hclust). Por ejemplo si elegimos $k=3$
+
+```{r}
+plot(res.ward, labels = FALSE)
+rect.hclust(res.ward , k=3)
+```
+
+Supongamos $k=4$. Tambien podemos pintar solo algún cluster en específico
+
+```{r}
+plot(res.ward, labels = FALSE)
+rect.hclust(res.ward , k=4, border = c("green","blue"),which = c(2,4))
+```
+
+El paquete `NbClust` contiene varias medidas de validación para el número de clusters, en general es un paquete para determinar el mejor número de clusters
+
+```{r}
+library(NbClust)
+res.nbclust <- NbClust(data=wiki4HE.all, distance = "euclidean",method="ward.D2", min.nc = 2 , max.nc = 15)
+```
+
+podemos ver los resultados de cada indicador nbclust
+
+```{r}
+res.nbclust$Best.nc
+```
+
+Tambien podemos ver como quedo la partición con la mejor elección 
+
+```{r}
+table(res.nbclust$Best.partition)
+```
+Obtenemos un grupo de tamaño extremadamente grande con más de dos tercios de las unidades. Desde un punto de vista cualitativo, esto a menudo es insatisfactorio y la solución involucrada a menudo se descarta. 
+
+A continuación gráficamos las medias para cada variable
+
+```{r}
+k <- 2
+mean.cluster.2 <- t( sapply( X = 1: k , FUN = function(nc) apply(wiki4HE.all[res.nbclust$Best.partition == nc , ] , 2 , mean)))
+plot(mean.cluster.2[1,], type = "o", pch = 19, xlab = "Variables", ylab = "Cluster means" , ylim = c(1,5),
+     axes = FALSE , col = "blue", main = "means" )
+lines(mean.cluster.2[2,] , type = "o", pch = 19 , col = "red")
+axis(1, at = 1: ncol (mean.cluster.2) , lab = colnames(mean.cluster.2) , cex.axis = 0.5)
+axis(2, at = 1:5 , las = 1)
+legend(12 , 5 , c("Clus1" , "Clus2") , pch = 19 , cex = 0.7 , col = c( "blue" , "red" ))
+```
+
+Notamos que en promedio hay un comportamiento consistente en los clusters. Sin embargo en la pregunta 4 (Qu4) es atípica en el cluster 2. La pregunta es "En mi área de especialización, Wikipedia tiene una calidad inferior a otros recursos educativos". Lo que puede estar pasando es que 2 clusters están generalizando, por lo que sería mejor probar con $k=3$. 
+
+Para $k=3$
+
+```{r}
+table(cutree(res.ward,k=3))
+```
+
+Notamos que el grupo grande se separó en 2 (grupo 1 y 3). Ahora graficamos
+
+
+```{r}
+k <- 3
+mean.cluster.3 <- t( sapply( X = 1: k , FUN = function(nc) apply(wiki4HE.all[cutree(res.ward,k=3) == nc , ] , 2 , mean)))
+plot(mean.cluster.3[1,], type = "o", pch = 19, xlab = "Variables", ylab = "Cluster means" , ylim = c(1,5),
+     axes = FALSE , col = "blue", main = "means" )
+lines(mean.cluster.3[2,] , type = "o", pch = 19 , col = "red")
+lines(mean.cluster.3[3,] , type = "o", pch = 19 , col = "darkgreen")
+axis(1, at = 1: ncol (mean.cluster.3) , lab = colnames(mean.cluster.3) , cex.axis = 0.5)
+axis(2, at = 1:5 , las = 1)
+legend(12 , 5 , c("Clus1" , "Clus2","Clus3") , pch = 19 , cex = 0.7 , col = c( "blue" , "red", "darkgreen" ))
+```
+
+Al graficar podemos ver que el grupo verde identifica a los encuestados que están fuertemente a favor de utilizar Wikipedia como recurso didáctico. El grupo azul identifica a los encuestados que, en general, están a favor de utilizar Wikipedia como recurso didáctico pero que no participan activamente del blog. El color  rojo son los que estàn menos de acuerdo con el uso de wikipedia como recurso didáctico.
+
+**Observación:** Existen otros paquetes para validar el número de clusters como `fpc`, `factoextra` y `clValid`
+

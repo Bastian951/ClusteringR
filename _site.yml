@@ -4,14 +4,20 @@ navbar:
   left:
     - text: "Inicio"
       href: index.html
-    - text: "Cluster jerarquico"
+    - text: "Cluster jerárquico"
       menu:
         - text: "Introducción"
           href: intro.html
-        - text: "Cluster Jerarquico"
+        - text: "Cluster Jerárquico"
           href: jerarquico.html
-        - text: "Aglomerativo"
+        - text: "Jerárquico aglomerativo"
           href: aglomerativo.html
+        - text: "Jerárquico divisivo"
+          href: divisivo.html
+        - text: "hclust y agnes"
+          href: hclust.html
+        - text: "DIANA y MOANA"
+          href: "diana.html"
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/

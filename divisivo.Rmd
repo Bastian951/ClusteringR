@@ -1,0 +1,35 @@
+---
+title: "**Cluster jerárquico divisivo**"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
+
+Los algoritmos aglomerativos comienzan desde $n$ clusters singleton hasta 1 cluster trivial con $n$ elementos. Los algoritmos divisivos son lo contrario, comenzamos con 1 cluster trivial con $n$ elementos y en cada paso un cluster se separa en 2 clusters. 
+
+Este método es menos frecuente que los aglomerativos, debido al costo computacional. Dado un criterio de optimización, exporar todos los posibles separamientos es muy caro. Por ejemplo, para el primer paso hay $2^{n-1}-1$ posibles maneras de dividir el cluster inicial. 
+
+El algoritmo divisivo mas famoso es el **Divisive Analysis Clustering (DIANA)** 
+
+### **Primer paso**
+
+- DIANA busca el singleton con la distancia promedio mas grande. Este singleton se utiliza para construir el segundo cluster llamado `splinter one`. 
+- Si las unidades están mas cercanas al splinter, se mueven a el. De esta forma separamos en 2 clusters.
+
+### **Segundo paso**
+
+Se repite el primer paso, pero ahora tenemos mas de 1 cluster. DIANA divide el cluster con el diametro mas grande, es decir, el cluster que contiene la distancia mas grande entre dos unidades
+
+### **Paquete en R**
+
+- `diana` en el paquete `cluster`
+
+Existe otro método divisivo para datos binarios llamado `MONA`. Este método tambien lo podemos encontrar en el paquete `cluster` con la función `mona`.
+
+En la pagina 6 veremos ejemplos en R.
+
+

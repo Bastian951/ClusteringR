@@ -11,7 +11,7 @@
 
 
 
-<title>Clustering Jerárquico Aglomerativo</title>
+<title>Cluster jerárquico divisivo</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -290,78 +290,34 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Clustering Jerárquico Aglomerativo</h1>
+<h1 class="title toc-ignore"><strong>Cluster jerárquico divisivo</strong></h1>
 
 </div>
 
 
-<p>El clustering jerárquico aglomerativo consiste en una serie de métodos que en cada paso unen los dos clusters mas similares. Dada una matriz de distancias <span class="math inline">\(D_n\)</span> la cual contiene distancias de <span class="math inline">\(n\)</span> clusters (inicialmente singletons) se deben seguir los siguientes pasos:</p>
-<ol style="list-style-type: decimal">
-<li><p>De acuerdo a <span class="math inline">\(D_n\)</span> unimos dos unidades (clusters singleton) con la minima distancia en un nuevo cluster. Esto lleva a una partición con <span class="math inline">\(n-1\)</span> clusters.</p></li>
-<li><p>Computar la nueva matriz de distancia <span class="math inline">\(D_{n-1}\)</span> de tamaño <span class="math inline">\((n-1) \times (n-1)\)</span>. Las distancias entre clusters singleton, se heredan desde la matriz original. Hay diversas alternativas para calcular la distancia entre los nuevos clusters y los restantes. (La elección distingue los métodos aglomerativos)</p></li>
-<li><p>Unir 2 clusters con minima distancia usando la matriz de <span class="math inline">\(D_{n-1}\)</span>. Dejando una partición de <span class="math inline">\(n-2\)</span> clusters.</p></li>
-<li><p>Repetir 2 y 3 hasta llegar a <span class="math inline">\(n=2\)</span> y obtener una partición trivial.</p></li>
-</ol>
-<p>El punto crucial en el el método aglomerativo consiste en la distancia entre la fusión de 2 clusters y otros. Por ejemplo la distancia entre la fusión de <span class="math inline">\(C_1\)</span> y <span class="math inline">\(C_2\)</span> que denotaremos <span class="math inline">\(C_{1,2}\)</span> con el cluster <span class="math inline">\(C_3\)</span>. Estos metodos está definidos por la formula <strong>Lance-Williams</strong></p>
-<p><span class="math display">\[d(C_{1,2},C_3) = \alpha_1 d(C_1,C_3)+\alpha_2 d(C_2,C_3) + \beta d(C_1,C_2)+\gamma \vert d(C_1,C_3)-d(C_2,C_3)\vert\]</span></p>
-<p>dependiendo de los valores <span class="math inline">\(\alpha_1, \alpha_2, \beta, \gamma\)</span> se define la clase de método aglomerativo.</p>
-<div id="métodos" class="section level2">
-<h2><strong>Métodos</strong></h2>
-<div id="single-linkage" class="section level3">
-<h3><strong>Single Linkage</strong></h3>
-<p>Consiste en la elección <span class="math inline">\(\alpha_1 = \alpha_2 = 0.5\)</span>, <span class="math inline">\(\beta=0\)</span> y <span class="math inline">\(\gamma = -0.5\)</span>. Obteniendo</p>
-<p><span class="math display">\[d(C_{1},C_2) =\min_{c_1 \in C_1, c_2 \in C_2} d(c_1,c_2)\]</span></p>
-</div>
-<div id="complete-linkage" class="section level3">
-<h3><strong>Complete Linkage</strong></h3>
-<p>Consiste en la elección <span class="math inline">\(\alpha_1 = \alpha_2 = \gamma = 0.5\)</span>, <span class="math inline">\(\beta=0\)</span></p>
-<p><span class="math display">\[d(C_{1},C_2) =\max_{c_1 \in C_1, c_2 \in C_2} d(c_1,c_2)\]</span></p>
-</div>
-<div id="average-linkage" class="section level3">
-<h3><strong>Average Linkage</strong></h3>
-<p>Consiste en la elección <span class="math inline">\(\alpha_1 = \frac{\vert C_1\vert}{\vert C_1\vert + \vert C_2\vert}\)</span>, <span class="math inline">\(\alpha_1 = \frac{\vert C_2\vert}{\vert C_1\vert + \vert C_2\vert}\)</span>, <span class="math inline">\(\beta=0\)</span></p>
-<p>Obteniendo</p>
-<p><span class="math display">\[d(C_{1},C_2) =\frac{\sum_{c_1\in C_1}\sum_{c_2\in C_2} d(c_1,c_2)}{\vert C_1 \vert \vert C_2\vert}\]</span></p>
-</div>
-<div id="método-wards" class="section level3">
-<h3><strong>Método Ward’s</strong></h3>
-<p>Consiste en la elección <span class="math inline">\(\alpha_1 = \frac{\vert C_1\vert+\vert C_3\vert}{\vert C_1\vert + \vert C_2\vert+\vert C_3\vert}\)</span>, <span class="math inline">\(\alpha_2 = \frac{\vert C_2\vert+\vert C_3\vert}{\vert C_1\vert + \vert C_2\vert+\vert C_3\vert}\)</span>, <span class="math inline">\(\beta=\frac{-\vert C_3\vert}{\vert C_1\vert + \vert C_2\vert+\vert C_3\vert}\)</span></p>
-<p>Obteniendo</p>
-<p><span class="math display">\[d(C_{1},C_2) = d(\bar{x}_{C_1},\bar{x}_{C_2})\]</span> donde <span class="math inline">\(\bar{x}_{C_i} = \bar{C_i}\)</span> con <span class="math inline">\(i=1,2\)</span></p>
-<p>En el siguiente link podemos encontrar un ejemplo numérico</p>
-<p><a href="https://people.revoledu.com/kardi/tutorial/Clustering/Numerical%20Example.htm" class="uri">https://people.revoledu.com/kardi/tutorial/Clustering/Numerical%20Example.htm</a></p>
-</div>
-</div>
-<div id="paquetes-de-r" class="section level2">
-<h2><strong>Paquetes de R</strong></h2>
+<div id="section" class="section level2">
+<h2></h2>
+<p>Los algoritmos aglomerativos comienzan desde <span class="math inline">\(n\)</span> clusters singleton hasta 1 cluster trivial con <span class="math inline">\(n\)</span> elementos. Los algoritmos divisivos son lo contrario, comenzamos con 1 cluster trivial con <span class="math inline">\(n\)</span> elementos y en cada paso un cluster se separa en 2 clusters.</p>
+<p>Este método es menos frecuente que los aglomerativos, debido al costo computacional. Dado un criterio de optimización, exporar todos los posibles separamientos es muy caro. Por ejemplo, para el primer paso hay <span class="math inline">\(2^{n-1}-1\)</span> posibles maneras de dividir el cluster inicial.</p>
+<p>El algoritmo divisivo mas famoso es el <strong>Divisive Analysis Clustering (DIANA)</strong></p>
+<div id="primer-paso" class="section level3">
+<h3><strong>Primer paso</strong></h3>
 <ul>
-<li>En el paquete <code>stats</code> podemos encontrar la función <code>hclust</code></li>
-<li>En el paquete <code>cluster</code>podemos encontrar la función <code>agnes</code></li>
-</ul>
-<div id="métodos-en-hclust" class="section level3">
-<h3><strong>Métodos en hclust</strong></h3>
-<ul>
-<li><strong>Single linkage method</strong>: “single”</li>
-<li><strong>Average linkage method</strong>: “average”</li>
-<li><strong>complete linkage method</strong>: “complete”</li>
-<li><strong>Variant of Ward’s method</strong>: “ward.D”</li>
-<li><strong>Ward’s method</strong>: “ward.D2”</li>
-<li><strong>McQuitty method</strong>: “mcquitty”</li>
-<li><strong>Median method</strong>: “median”</li>
-<li><strong>Centroid method</strong>: “centroid”</li>
+<li>DIANA busca el singleton con la distancia promedio mas grande. Este singleton se utiliza para construir el segundo cluster llamado <code>splinter one</code>.</li>
+<li>Si las unidades están mas cercanas al splinter, se mueven a el. De esta forma separamos en 2 clusters.</li>
 </ul>
 </div>
-<div id="métodos-en-agnes" class="section level3">
-<h3><strong>Métodos en agnes</strong></h3>
+<div id="segundo-paso" class="section level3">
+<h3><strong>Segundo paso</strong></h3>
+<p>Se repite el primer paso, pero ahora tenemos mas de 1 cluster. DIANA divide el cluster con el diametro mas grande, es decir, el cluster que contiene la distancia mas grande entre dos unidades</p>
+</div>
+<div id="paquete-en-r" class="section level3">
+<h3><strong>Paquete en R</strong></h3>
 <ul>
-<li><strong>Single linkage method</strong>: “single”</li>
-<li><strong>Average linkage method</strong>: “average”</li>
-<li><strong>Complete linkage method</strong>: “complete”</li>
-<li><strong>Ward’s method</strong>: “ward”</li>
-<li><strong>McQuitty method</strong>: “weighted”</li>
-<li><strong>Variant of the average linkage</strong> “gaverage”</li>
+<li><code>diana</code> en el paquete <code>cluster</code></li>
 </ul>
-<p>En la página 5 probamos estas librerias en R</p>
+<p>Existe otro método divisivo para datos binarios llamado <code>MONA</code>. Este método tambien lo podemos encontrar en el paquete <code>cluster</code> con la función <code>mona</code>.</p>
+<p>En la pagina 6 veremos ejemplos en R.</p>
 </div>
 </div>
 

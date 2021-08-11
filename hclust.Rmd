@@ -1,0 +1,237 @@
+---
+title: "**Función agnes y hclust**"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Dataset**
+
+Utilizaremos el dataset `wine`del paquete `datasetsICR`. Este dataset contiene datos de 178 vinos italianos con 13 componentes. Los vinos se clasifican en 3 clases, dependiendo del cultivo. 
+
+```{r}
+library ( datasetsICR )
+data("wine")
+str (wine)
+```
+Debido a que los valores están en distintas escalas, estandarizaremos los datos. Luego utilizaremos la distancia Euclideana para obtener la matriz de distancias.
+
+#### **Estandarización **
+```{r}
+wine.Z <- scale(wine[,2: ncol(wine)],center = TRUE, scale = TRUE)
+```
+
+#### **Cálculo de la matriz de distancias**
+
+La matriz de distancias la podemos obtener de diversas formas
+
+```{r}
+#Con la función dist 
+D.wine <- dist(x=wine.Z,method = "euclidean")
+
+#Con la función daisy
+library(cluster)
+D.wine.bis <- daisy(x=wine.Z, metric = "euclidean")
+```
+Podemos comprobar que el resultado es el mismo 
+
+```{r}
+sum(abs(D.wine - D.wine.bis))
+```
+
+**Observación:** daisy permite estandarizar, pero estandariza despues de calcular las distancias, por lo que no se obtiene el mismo resultado, es preferible estandarizar antes.
+
+## **agnes**
+
+El paquete `agnes` acepta tanto una matriz de distancia, como un dataframe con los valores. En el caso de una matriz de distancia, automaticamente la detecta y se obtiene `diss=TRUE`. En caso de ser un dataframe, automaticamente lo detecta y se obtiene `diss=FALSE`. 
+
+Al utilizar agnes con un dataframe por defecto utiliza la metrica Euclideana. Por defecto utiliza el método average linkage 
+
+```{r}
+res.agnes <- agnes(x=wine.Z , diss = FALSE)
+res.agnes.2 <- agnes(x=D.wine, diss = TRUE )
+```
+
+Agnes retorna 8 componentes. Los mas importantes son order, height y merge
+
+```{r}
+names(res.agnes)
+```
+Merge es una matriz de $(n-1) \times 2$. En la fila $i$, las columnas 1 y 2 representan los cluster que se unieron en el paso $i$. Veamos 10 pasos
+```{r}
+res.agnes$merge[1:10,]
+```
+
+`height` guarda las distancias en cada paso, estos valores no los usamos directamente al igual que `order`. Si no que los usamos para el dendrograma. 
+
+## **Dendrograma **
+
+El dendrograma es un arbol, util para graficar el analisis jerarquico. El problema es que mientras aumenta $n$ se vuelve engorroso.  Graficamente podemos trazar una linea horizontal dependiendo de cuantos cluster queramos, de esta forma en el eje de valores podemos ver que valores pertenecen al cluster. 
+
+```{r}
+plot(res.agnes ,which.plots=2 , main = "Average")
+```
+
+Podemos eliminar los labels con `labels=FALSE`
+
+```{r}
+plot(res.agnes ,which.plots=2 , labels=FALSE, main = "Average")
+```
+
+El coeficiente de aglomeración aparece abajo del grafico, su uso parece ser de ayuda limitada ya que el valor del coeficiente crece con $n$. Por lo tanto, el coeficiente no debe usarse para comparar soluciones de conjuntos de datos de tamaños muy diferentes.
+
+Podemos cambiar la forma del dendrograma
+
+```{r}
+plot(as.dendrogram(res.agnes), type = "triangle", ylab = "Height")
+```
+
+Debido a que al tener tantos valores no se puede visualizar correctamente, podemos usar zoom
+
+
+```{r}
+plot(as.dendrogram(res.agnes), type = "triangle",xlim = c(1, 20), ylim = c(1,8))
+```
+
+
+
+## **hclust**
+
+Utilizando los mismos datos ahora utilizaremos la función hclust. Esta función a diferencia de agnes utiliza por defecto el método `complete linkage`
+
+```{r}
+res.hclust <- hclust(d=D.wine)
+```
+
+Esta función retorna 7 componentes. Al igual que con agnes, tiene merge, height y order
+
+```{r}
+names(res.hclust)
+```
+
+```{r}
+plot(res.hclust , main = " Complete" )
+```
+
+```{r}
+plot(as.dendrogram(res.hclust), type = "triangle", ylab = "Height")
+```
+
+Al tener muchos datos no es posible visualizar correctamente las etiquetas por lo que podemos hacer zoom
+
+```{r}
+plot(as.dendrogram(res.hclust), xlim = c(1, 20), ylim = c(1,8))
+```
+
+El dendograma para hclust puede ser mejorado con varios paquetes (lamentablemente hasta el momento no encontré paquetes para mejorar en dendrograma de agnes)
+
+## **Variantes de los dendrogramas (hclust)**
+
+### **Paquete ape**
+
+Con el paquete `ape` podemos hacer gráficos mas avanzados y además podemos pintar los clusters mediante la función cutree del paquete `stats`. Eligiremos 3 clusters
+
+```{r}
+library("ape")
+colors = c("red", "blue", "green", "black")
+clus3= cutree(res.hclust, 3)
+plot(as.phylo(res.hclust), type = "fan", tip.color = colors[clus3], label.offset = 1, cex = 0.7)
+```
+
+### **Raices con libreria ape (hclust)**
+
+```{r}
+plot(as.phylo(res.hclust), type = "unrooted",  tip.color = colors[clus3], cex = 0.6, no.margin = TRUE)
+```
+
+### **Radial con paquete ape (hclust)**
+
+```{r}
+plot(as.phylo(res.hclust),  type = "radial")
+```
+
+Tambien mediante el paquete `ape`
+
+
+```{r}
+plot(as.phylo(res.hclust), type = "cladogram", cex = 0.6,
+     edge.color = "steelblue", edge.width = 2, edge.lty = 2,
+     tip.color = "steelblue")
+```
+
+Otro paquete para mejorar la visualización es `ggdendro` el cual utiliza `ggplot2`. 
+
+
+Mediante el paquete `dendextend` se pueden hacer dendrogramas completamente personalizados, por ahora dejo este link sobre visualización y personalización de dendrogramas.
+
+http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning
+
+### **Ejemplos avanzados con dendextend**
+
+```{r}
+library(dendextend)
+
+dend <- USArrests[1:5,] %>%  scale %>% 
+        dist %>% hclust %>% as.dendrogram
+
+# Color labels by specifying the number of cluster (k)
+dend %>% set("labels_col", value = c("green", "blue"), k=2) %>% 
+          plot(main = "Color labels \nper cluster")
+abline(h = 2, lty = 2)
+```
+
+## **Número optimo de Clusters**
+
+En el datasets que estamos usando conocemos el numero de clusters, pero no siempre tendremos este dato. Muchas veces tendremos que decidir cuantos clusters utilizar. Frecuentemente se utiliza el dendrograma para decidir. Muchas veces el numero de clusters se elige por interes externos, por ejemplo el equipo de marketing necesita encontrar 3 grupos para focalizar ventas.
+
+Como vimos anteriormente `cutree` del paquete `stats` permite cortar el arbol. Ademas podemos crear una matriz de confusión
+
+```{r}
+cluster.hclust<-cutree(res.hclust , k = 3)
+table(cluster.hclust , wine$Class)
+```
+Notemos que utilizando el algoritmo jerárquico aglomerativo con método complete linkage obtenemos 29 errores. Es decir, un 16% de los datos fueron erronamente clasificados. 
+
+```{r}
+res.hclust.single<- hclust(d=D.wine, method = "single")
+plot(res.hclust.single, main = "Single")
+res.hclust.ward<-hclust(d=D.wine ,method = "ward.D2")
+plot(res.hclust.ward , main = "Ward")
+```
+
+Notemos que el simple linkage obtiene clusters dispersos, mientras que el método Ward's obtiene 3 clusters bien separados. 
+
+```{r}
+cluster.hclust.ward <- cutree(res.hclust.ward,k = 3)
+table(cluster.hclust.ward, wine$Class)
+```
+
+Con este método nos equivocamos en 13 valores. 
+
+El paquete `mclust` tiene la función `AdjustedRandIndex` **(ARI)** (parecido al accuracy en predicciones). El ARI permite comparar dos modelos (similares si es cercano a 1) y como score. 
+
+https://en.wikipedia.org/wiki/Rand_index
+
+```{r message=FALSE, warning=FALSE}
+library(mclust)
+adjustedRandIndex(cluster.hclust, wine$Class)
+```
+```{r}
+adjustedRandIndex(cluster.hclust.ward, wine$Class)
+```
+Para calcular las medias de los químicos de los vinos en cada cluster podemos utilizar la siguiente función
+
+
+```{r}
+k <- 3
+mean.cluster <- t(sapply(X = 1:k, FUN = function(nc)
++ apply(wine[cluster.hclust.ward == nc , 2: ncol(wine)],2,mean)))
+round(mean.cluster , 2)
+```
+Mediante esta tabla podemos descrubir que el cluster 1 tiene altos valores en promedio para el Alcohol, Magnesium, Proanthocyanins, OD280/OD315 of diluted wines y Proline y bajos valores en promedio de Alcalinity of ash y Nonflavanoid phenols. 
+
+
+
+
+

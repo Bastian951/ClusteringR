@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Función agnes y hclust</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Clustering en R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Inicio</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Cluster jerárquico
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="intro.html">Introducción</a>
+    </li>
+    <li>
+      <a href="jerarquico.html">Cluster Jerárquico</a>
+    </li>
+    <li>
+      <a href="aglomerativo.html">Jerárquico aglomerativo</a>
+    </li>
+    <li>
+      <a href="divisivo.html">Jerárquico divisivo</a>
+    </li>
+    <li>
+      <a href="hclust.html">hclust y agnes</a>
+    </li>
+    <li>
+      <a href="diana.html">DIANA y MOANA</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="http://github.com/Bastian951/">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><strong>Función agnes y hclust</strong></h1>
+
+</div>
+
+
+<div id="dataset" class="section level2">
+<h2><strong>Dataset</strong></h2>
+<p>Utilizaremos el dataset <code>wine</code>del paquete <code>datasetsICR</code>. Este dataset contiene datos de 178 vinos italianos con 13 componentes. Los vinos se clasifican en 3 clases, dependiendo del cultivo.</p>
+<pre class="r"><code>library ( datasetsICR )
+data(&quot;wine&quot;)
+str (wine)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    178 obs. of  14 variables:
+##  $ Class                       : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ Alcohol                     : num  14.2 13.2 13.2 14.4 13.2 ...
+##  $ Malic acid                  : num  1.71 1.78 2.36 1.95 2.59 1.76 1.87 2.15 1.64 1.35 ...
+##  $ Ash                         : num  2.43 2.14 2.67 2.5 2.87 2.45 2.45 2.61 2.17 2.27 ...
+##  $ Alcalinity of ash           : num  15.6 11.2 18.6 16.8 21 15.2 14.6 17.6 14 16 ...
+##  $ Magnesium                   : int  127 100 101 113 118 112 96 121 97 98 ...
+##  $ Total phenols               : num  2.8 2.65 2.8 3.85 2.8 3.27 2.5 2.6 2.8 2.98 ...
+##  $ Flavanoids                  : num  3.06 2.76 3.24 3.49 2.69 3.39 2.52 2.51 2.98 3.15 ...
+##  $ Nonflavanoid phenols        : num  0.28 0.26 0.3 0.24 0.39 0.34 0.3 0.31 0.29 0.22 ...
+##  $ Proanthocyanins             : num  2.29 1.28 2.81 2.18 1.82 1.97 1.98 1.25 1.98 1.85 ...
+##  $ Color intensity             : num  5.64 4.38 5.68 7.8 4.32 6.75 5.25 5.05 5.2 7.22 ...
+##  $ Hue                         : num  1.04 1.05 1.03 0.86 1.04 1.05 1.02 1.06 1.08 1.01 ...
+##  $ OD280/OD315 of diluted wines: num  3.92 3.4 3.17 3.45 2.93 2.85 3.58 3.58 2.85 3.55 ...
+##  $ Proline                     : int  1065 1050 1185 1480 735 1450 1290 1295 1045 1045 ...</code></pre>
+<p>Debido a que los valores están en distintas escalas, estandarizaremos los datos. Luego utilizaremos la distancia Euclideana para obtener la matriz de distancias.</p>
+<div id="estandarización" class="section level4">
+<h4><strong>Estandarización </strong></h4>
+<pre class="r"><code>wine.Z &lt;- scale(wine[,2: ncol(wine)],center = TRUE, scale = TRUE)</code></pre>
+</div>
+<div id="cálculo-de-la-matriz-de-distancias" class="section level4">
+<h4><strong>Cálculo de la matriz de distancias</strong></h4>
+<p>La matriz de distancias la podemos obtener de diversas formas</p>
+<pre class="r"><code>#Con la función dist 
+D.wine &lt;- dist(x=wine.Z,method = &quot;euclidean&quot;)
+
+#Con la función daisy
+library(cluster)
+D.wine.bis &lt;- daisy(x=wine.Z, metric = &quot;euclidean&quot;)</code></pre>
+<p>Podemos comprobar que el resultado es el mismo</p>
+<pre class="r"><code>sum(abs(D.wine - D.wine.bis))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<p><strong>Observación:</strong> daisy permite estandarizar, pero estandariza despues de calcular las distancias, por lo que no se obtiene el mismo resultado, es preferible estandarizar antes.</p>
+</div>
+</div>
+<div id="agnes" class="section level2">
+<h2><strong>agnes</strong></h2>
+<p>El paquete <code>agnes</code> acepta tanto una matriz de distancia, como un dataframe con los valores. En el caso de una matriz de distancia, automaticamente la detecta y se obtiene <code>diss=TRUE</code>. En caso de ser un dataframe, automaticamente lo detecta y se obtiene <code>diss=FALSE</code>.</p>
+<p>Al utilizar agnes con un dataframe por defecto utiliza la metrica Euclideana. Por defecto utiliza el método average linkage</p>
+<pre class="r"><code>res.agnes &lt;- agnes(x=wine.Z , diss = FALSE)
+res.agnes.2 &lt;- agnes(x=D.wine, diss = TRUE )</code></pre>
+<p>Agnes retorna 8 componentes. Los mas importantes son order, height y merge</p>
+<pre class="r"><code>names(res.agnes)</code></pre>
+<pre><code>## [1] &quot;order&quot;  &quot;height&quot; &quot;ac&quot;     &quot;merge&quot;  &quot;diss&quot;   &quot;call&quot;   &quot;method&quot; &quot;data&quot;</code></pre>
+<p>Merge es una matriz de <span class="math inline">\((n-1) \times 2\)</span>. En la fila <span class="math inline">\(i\)</span>, las columnas 1 y 2 representan los cluster que se unieron en el paso <span class="math inline">\(i\)</span>. Veamos 10 pasos</p>
+<pre class="r"><code>res.agnes$merge[1:10,]</code></pre>
+<pre><code>##       [,1] [,2]
+##  [1,]  -10  -48
+##  [2,] -132 -134
+##  [3,]  -12  -13
+##  [4,]  -16  -54
+##  [5,]  -93 -108
+##  [6,]  -35  -38
+##  [7,]   -1  -21
+##  [8,]  -17  -18
+##  [9,] -165 -173
+## [10,]  -23  -30</code></pre>
+<p><code>height</code> guarda las distancias en cada paso, estos valores no los usamos directamente al igual que <code>order</code>. Si no que los usamos para el dendrograma.</p>
+</div>
+<div id="dendrograma" class="section level2">
+<h2><strong>Dendrograma </strong></h2>
+<p>El dendrograma es un arbol, util para graficar el analisis jerarquico. El problema es que mientras aumenta <span class="math inline">\(n\)</span> se vuelve engorroso. Graficamente podemos trazar una linea horizontal dependiendo de cuantos cluster queramos, de esta forma en el eje de valores podemos ver que valores pertenecen al cluster.</p>
+<pre class="r"><code>plot(res.agnes ,which.plots=2 , main = &quot;Average&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Podemos eliminar los labels con <code>labels=FALSE</code></p>
+<pre class="r"><code>plot(res.agnes ,which.plots=2 , labels=FALSE, main = &quot;Average&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>El coeficiente de aglomeración aparece abajo del grafico, su uso parece ser de ayuda limitada ya que el valor del coeficiente crece con <span class="math inline">\(n\)</span>. Por lo tanto, el coeficiente no debe usarse para comparar soluciones de conjuntos de datos de tamaños muy diferentes.</p>
+<p>Podemos cambiar la forma del dendrograma</p>
+<pre class="r"><code>plot(as.dendrogram(res.agnes), type = &quot;triangle&quot;, ylab = &quot;Height&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Debido a que al tener tantos valores no se puede visualizar correctamente, podemos usar zoom</p>
+<pre class="r"><code>plot(as.dendrogram(res.agnes), type = &quot;triangle&quot;,xlim = c(1, 20), ylim = c(1,8))</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="hclust" class="section level2">
+<h2><strong>hclust</strong></h2>
+<p>Utilizando los mismos datos ahora utilizaremos la función hclust. Esta función a diferencia de agnes utiliza por defecto el método <code>complete linkage</code></p>
+<pre class="r"><code>res.hclust &lt;- hclust(d=D.wine)</code></pre>
+<p>Esta función retorna 7 componentes. Al igual que con agnes, tiene merge, height y order</p>
+<pre class="r"><code>names(res.hclust)</code></pre>
+<pre><code>## [1] &quot;merge&quot;       &quot;height&quot;      &quot;order&quot;       &quot;labels&quot;      &quot;method&quot;     
+## [6] &quot;call&quot;        &quot;dist.method&quot;</code></pre>
+<pre class="r"><code>plot(res.hclust , main = &quot; Complete&quot; )</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>plot(as.dendrogram(res.hclust), type = &quot;triangle&quot;, ylab = &quot;Height&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>Al tener muchos datos no es posible visualizar correctamente las etiquetas por lo que podemos hacer zoom</p>
+<pre class="r"><code>plot(as.dendrogram(res.hclust), xlim = c(1, 20), ylim = c(1,8))</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>El dendograma para hclust puede ser mejorado con varios paquetes (lamentablemente hasta el momento no encontré paquetes para mejorar en dendrograma de agnes)</p>
+</div>
+<div id="variantes-de-los-dendrogramas-hclust" class="section level2">
+<h2><strong>Variantes de los dendrogramas (hclust)</strong></h2>
+<div id="paquete-ape" class="section level3">
+<h3><strong>Paquete ape</strong></h3>
+<p>Con el paquete <code>ape</code> podemos hacer gráficos mas avanzados y además podemos pintar los clusters mediante la función cutree del paquete <code>stats</code>. Eligiremos 3 clusters</p>
+<pre class="r"><code>library(&quot;ape&quot;)
+colors = c(&quot;red&quot;, &quot;blue&quot;, &quot;green&quot;, &quot;black&quot;)
+clus3= cutree(res.hclust, 3)
+plot(as.phylo(res.hclust), type = &quot;fan&quot;, tip.color = colors[clus3], label.offset = 1, cex = 0.7)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+</div>
+<div id="raices-con-libreria-ape-hclust" class="section level3">
+<h3><strong>Raices con libreria ape (hclust)</strong></h3>
+<pre class="r"><code>plot(as.phylo(res.hclust), type = &quot;unrooted&quot;,  tip.color = colors[clus3], cex = 0.6, no.margin = TRUE)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+<div id="radial-con-paquete-ape-hclust" class="section level3">
+<h3><strong>Radial con paquete ape (hclust)</strong></h3>
+<pre class="r"><code>plot(as.phylo(res.hclust),  type = &quot;radial&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<p>Tambien mediante el paquete <code>ape</code></p>
+<pre class="r"><code>plot(as.phylo(res.hclust), type = &quot;cladogram&quot;, cex = 0.6,
+     edge.color = &quot;steelblue&quot;, edge.width = 2, edge.lty = 2,
+     tip.color = &quot;steelblue&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>Otro paquete para mejorar la visualización es <code>ggdendro</code> el cual utiliza <code>ggplot2</code>.</p>
+<p>Mediante el paquete <code>dendextend</code> se pueden hacer dendrogramas completamente personalizados, por ahora dejo este link sobre visualización y personalización de dendrogramas.</p>
+<p><a href="http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning" class="uri">http://www.sthda.com/english/wiki/beautiful-dendrogram-visualizations-in-r-5-must-known-methods-unsupervised-machine-learning</a></p>
+</div>
+<div id="ejemplos-avanzados-con-dendextend" class="section level3">
+<h3><strong>Ejemplos avanzados con dendextend</strong></h3>
+<pre class="r"><code>library(dendextend)</code></pre>
+<pre><code>## 
+## ---------------------
+## Welcome to dendextend version 1.15.1
+## Type citation(&#39;dendextend&#39;) for how to cite the package.
+## 
+## Type browseVignettes(package = &#39;dendextend&#39;) for the package vignette.
+## The github page is: https://github.com/talgalili/dendextend/
+## 
+## Suggestions and bug-reports can be submitted at: https://github.com/talgalili/dendextend/issues
+## Or contact: &lt;tal.galili@gmail.com&gt;
+## 
+##  To suppress this message use:  suppressPackageStartupMessages(library(dendextend))
+## ---------------------</code></pre>
+<pre><code>## 
+## Attaching package: &#39;dendextend&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ape&#39;:
+## 
+##     ladderize, rotate</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     cutree</code></pre>
+<pre class="r"><code>dend &lt;- USArrests[1:5,] %&gt;%  scale %&gt;% 
+        dist %&gt;% hclust %&gt;% as.dendrogram
+
+# Color labels by specifying the number of cluster (k)
+dend %&gt;% set(&quot;labels_col&quot;, value = c(&quot;green&quot;, &quot;blue&quot;), k=2) %&gt;% 
+          plot(main = &quot;Color labels \nper cluster&quot;)
+abline(h = 2, lty = 2)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+</div>
+</div>
+<div id="número-optimo-de-clusters" class="section level2">
+<h2><strong>Número optimo de Clusters</strong></h2>
+<p>En el datasets que estamos usando conocemos el numero de clusters, pero no siempre tendremos este dato. Muchas veces tendremos que decidir cuantos clusters utilizar. Frecuentemente se utiliza el dendrograma para decidir. Muchas veces el numero de clusters se elige por interes externos, por ejemplo el equipo de marketing necesita encontrar 3 grupos para focalizar ventas.</p>
+<p>Como vimos anteriormente <code>cutree</code> del paquete <code>stats</code> permite cortar el arbol. Ademas podemos crear una matriz de confusión</p>
+<pre class="r"><code>cluster.hclust&lt;-cutree(res.hclust , k = 3)
+table(cluster.hclust , wine$Class)</code></pre>
+<pre><code>##               
+## cluster.hclust  1  2  3
+##              1 51 18  0
+##              2  8 50  0
+##              3  0  3 48</code></pre>
+<p>Notemos que utilizando el algoritmo jerárquico aglomerativo con método complete linkage obtenemos 29 errores. Es decir, un 16% de los datos fueron erronamente clasificados.</p>
+<pre class="r"><code>res.hclust.single&lt;- hclust(d=D.wine, method = &quot;single&quot;)
+plot(res.hclust.single, main = &quot;Single&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>res.hclust.ward&lt;-hclust(d=D.wine ,method = &quot;ward.D2&quot;)
+plot(res.hclust.ward , main = &quot;Ward&quot;)</code></pre>
+<p><img src="hclust_files/figure-html/unnamed-chunk-23-2.png" width="672" /></p>
+<p>Notemos que el simple linkage obtiene clusters dispersos, mientras que el método Ward’s obtiene 3 clusters bien separados.</p>
+<pre class="r"><code>cluster.hclust.ward &lt;- cutree(res.hclust.ward,k = 3)
+table(cluster.hclust.ward, wine$Class)</code></pre>
+<pre><code>##                    
+## cluster.hclust.ward  1  2  3
+##                   1 59  5  0
+##                   2  0 58  0
+##                   3  0  8 48</code></pre>
+<p>Con este método nos equivocamos en 13 valores.</p>
+<p>El paquete <code>mclust</code> tiene la función <code>AdjustedRandIndex</code> <strong>(ARI)</strong> (parecido al accuracy en predicciones). El ARI permite comparar dos modelos (similares si es cercano a 1) y como score.</p>
+<p><a href="https://en.wikipedia.org/wiki/Rand_index" class="uri">https://en.wikipedia.org/wiki/Rand_index</a></p>
+<pre class="r"><code>library(mclust)
+adjustedRandIndex(cluster.hclust, wine$Class)</code></pre>
+<pre><code>## [1] 0.5771436</code></pre>
+<pre class="r"><code>adjustedRandIndex(cluster.hclust.ward, wine$Class)</code></pre>
+<pre><code>## [1] 0.7899332</code></pre>
+<p>Para calcular las medias de los químicos de los vinos en cada cluster podemos utilizar la siguiente función</p>
+<pre class="r"><code>k &lt;- 3
+mean.cluster &lt;- t(sapply(X = 1:k, FUN = function(nc)
++ apply(wine[cluster.hclust.ward == nc , 2: ncol(wine)],2,mean)))
+round(mean.cluster , 2)</code></pre>
+<pre><code>##      Alcohol Malic acid  Ash Alcalinity of ash Magnesium Total phenols
+## [1,]   13.67       1.97 2.46             17.53    106.16          2.85
+## [2,]   12.20       1.94 2.22             20.21     92.55          2.26
+## [3,]   13.06       3.17 2.41             21.00     99.86          1.69
+##      Flavanoids Nonflavanoid phenols Proanthocyanins Color intensity  Hue
+## [1,]       3.01                 0.29            1.91            5.45 1.07
+## [2,]       2.09                 0.36            1.69            2.90 1.06
+## [3,]       0.85                 0.45            1.13            6.85 0.72
+##      OD280/OD315 of diluted wines Proline
+## [1,]                         3.16 1076.05
+## [2,]                         2.86  501.43
+## [3,]                         1.73  624.95</code></pre>
+<p>Mediante esta tabla podemos descrubir que el cluster 1 tiene altos valores en promedio para el Alcohol, Magnesium, Proanthocyanins, OD280/OD315 of diluted wines y Proline y bajos valores en promedio de Alcalinity of ash y Nonflavanoid phenols.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

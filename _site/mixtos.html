@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Datos mixtos</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/yeti.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Clustering en R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Inicio</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Cluster jerárquico
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="intro.html">Introducción</a>
+    </li>
+    <li>
+      <a href="jerarquico.html">Cluster Jerárquico</a>
+    </li>
+    <li>
+      <a href="aglomerativo.html">Jerárquico aglomerativo</a>
+    </li>
+    <li>
+      <a href="divisivo.html">Jerárquico divisivo</a>
+    </li>
+    <li>
+      <a href="hclust.html">hclust y agnes</a>
+    </li>
+    <li>
+      <a href="diana.html">DIANA y MOANA</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="http://github.com/Bastian951/">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore"><strong>Datos mixtos</strong></h1>
+
+</div>
+
+
+<div id="caso-1-hoteles" class="section level2">
+<h2><strong>Caso 1: Hoteles</strong></h2>
+<p>Ahora utilizaremos el dataset <code>lasvegas.trip</code> del paquete <code>datasetsICR</code>. Este dataset contiene datos de 21 hoteles con 9 caracteristicas. Estas caracteristicas son cuantitativas y cualitativas</p>
+<pre class="r"><code>library(datasetsICR)
+data (&quot;lasvegas.trip&quot;)
+str(lasvegas.trip)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    21 obs. of  9 variables:
+##  $ Score        : num  4.21 4.12 3.21 4.54 3.71 ...
+##  $ Hotel.stars  : num  5 5 3 5 3 3 3 3 4 4 ...
+##  $ Nr..rooms    : num  3933 3348 3773 2034 3981 ...
+##  $ Pool         : Factor w/ 2 levels &quot;NO&quot;,&quot;YES&quot;: 2 2 1 2 2 2 2 2 2 2 ...
+##  $ Gym          : Factor w/ 2 levels &quot;NO&quot;,&quot;YES&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ Tennis.court : Factor w/ 2 levels &quot;NO&quot;,&quot;YES&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ Spa          : Factor w/ 2 levels &quot;NO&quot;,&quot;YES&quot;: 2 2 1 2 2 1 2 1 2 2 ...
+##  $ Casino       : Factor w/ 2 levels &quot;NO&quot;,&quot;YES&quot;: 2 2 2 2 2 1 2 2 2 2 ...
+##  $ Free.internet: Factor w/ 2 levels &quot;NO&quot;,&quot;YES&quot;: 2 2 2 2 2 2 2 2 1 2 ...</code></pre>
+<pre class="r"><code>library(cluster)
+D &lt;- daisy(lasvegas.trip[,-3],metric=&quot;gower&quot;)</code></pre>
+<pre class="r"><code>res.agnes &lt;- agnes(D, diss = TRUE, method = &quot;complete&quot;)</code></pre>
+<pre class="r"><code>res.agnes$order.lab &lt;- rep (&quot; &quot; , 21)
+plot(res.agnes, hang = -0.1 , which.plots = 2 , main = &quot; &quot;)</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>cluster.agnes &lt;- cutree(res.agnes , k = 2)
+table(cluster.agnes)</code></pre>
+<pre><code>## cluster.agnes
+##  1  2 
+## 16  5</code></pre>
+<pre class="r"><code>res.hclust &lt;- hclust(D)
+cluster.hclust &lt;- cutree(res.hclust , k = 2)
+res.hclust$order.lab &lt;- rep (&quot; &quot; , 21)</code></pre>
+<pre class="r"><code>library(mclust)
+adjustedRandIndex(cluster.hclust, cluster.agnes)</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>library(&quot;ape&quot;)
+colors = c(&quot;green&quot;, &quot;black&quot;)
+plot(as.phylo(res.hclust), tip.color = colors[cluster.hclust])</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Podemos calcular los promedios por cluster para el score, la cantidad de estrellas y número de habitaciones</p>
+<pre class="r"><code>k &lt;- 2
+lapply(X=1:k, FUN=function(nc) apply(lasvegas.trip[cluster.agnes == nc , 1:3], 2 , mean ) )</code></pre>
+<pre><code>## [[1]]
+##       Score Hotel.stars   Nr..rooms 
+##    4.151042    4.312500 2520.562500 
+## 
+## [[2]]
+##       Score Hotel.stars   Nr..rooms 
+##    4.033333    3.200000 1159.000000</code></pre>
+<p>Notemos que no hay una gran diferencia en el score, pero si en la cantidad de estrellas de los hoteles y del numero de habitaciones. Esto se debe a que el score es subjetivo debido al usuario. Para las variables categoricas podemos plotear un barplot y podemos agregar el p-value de un test <span class="math inline">\(\chi^2\)</span> (El test <span class="math inline">\(\chi^2\)</span> tiene como hipótesis nula que las columnas y las filas de la tabla de contingencia son independientes, en este caso nos referimos a que (SI,NO) es independiente de (CLUSTER 1, CLUSTER 2))</p>
+<pre class="r"><code>par(mfrow=c(3 , 2))
+for(j in 4: dim(lasvegas.trip)[2]){
+
+  counts &lt;- table(lasvegas.trip[,j],cluster.agnes)
+  barplot(counts, main=names(lasvegas.trip)[j], names.arg = paste(&quot;Clus. &quot;, colnames(counts)) ,
+          xlab =round(chisq.test(counts)$p.value , 2), col = c(&quot;darkblue&quot;, &quot;red&quot;),
+          legend =rownames(counts))
+}</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>Notemos que se obtuvieron p-values cercanos a 1 y cercanos a 0. Los valores cercanos a 0 indican que es poco probable que la diferencia observada se deba al azar. Los valores cercanos a 1 sugieren que no hay diferencia entre los grupos, salvo que se deba al azar.</p>
+</div>
+<div id="caso-2-banderas" class="section level2">
+<h2><strong>Caso 2: Banderas</strong></h2>
+<p>El dataset <code>flags</code> del paquete <code>datasetsICR</code> contiene 194 banderas con 29 características, algunas de ellas cualitativas y otras cuantitativas.</p>
+<pre class="r"><code>data(&quot;flags&quot;)
+str(flags)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    194 obs. of  29 variables:
+##  $ landmass  : Factor w/ 6 levels &quot;N.America&quot;,&quot;S.America&quot;,..: 5 3 4 6 3 4 1 1 2 2 ...
+##  $ zone      : Factor w/ 4 levels &quot;NE&quot;,&quot;SE&quot;,&quot;SW&quot;,..: 1 1 1 3 1 2 4 4 3 3 ...
+##  $ area      : int  648 29 2388 0 0 1247 0 0 2777 2777 ...
+##  $ population: int  16 3 20 0 0 7 0 0 28 28 ...
+##  $ language  : Factor w/ 10 levels &quot;English&quot;,&quot;Spanish&quot;,..: 10 6 8 1 6 10 1 1 2 2 ...
+##  $ religion  : Factor w/ 8 levels &quot;Catholic&quot;,&quot;Other Christian&quot;,..: 3 7 3 2 1 6 2 2 1 1 ...
+##  $ bars      : int  0 0 2 0 3 0 0 0 0 0 ...
+##  $ stripes   : int  3 0 0 0 0 2 1 1 3 3 ...
+##  $ colours   : int  5 3 3 5 3 3 3 5 2 3 ...
+##  $ red       : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 2 2 2 2 2 2 1 2 1 1 ...
+##  $ green     : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 2 1 2 1 1 1 1 1 1 1 ...
+##  $ blue      : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 1 1 1 2 2 1 2 2 2 2 ...
+##  $ gold      : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 2 2 1 2 2 2 1 2 1 2 ...
+##  $ white     : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 2 1 2 2 1 1 2 2 2 2 ...
+##  $ black     : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 2 2 1 1 1 2 1 2 1 1 ...
+##  $ orange    : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 1 1 1 2 1 1 2 1 1 1 ...
+##  $ mainhue   : Factor w/ 8 levels &quot;black&quot;,&quot;blue&quot;,..: 5 7 5 2 4 7 8 7 2 2 ...
+##  $ circles   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ crosses   : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ saltires  : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ quarters  : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ sunstars  : int  1 1 1 0 0 1 0 1 0 1 ...
+##  $ crescent  : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 1 1 2 1 1 1 1 1 1 1 ...
+##  $ triangle  : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 1 1 1 2 1 1 1 2 1 1 ...
+##  $ icon      : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 2 1 1 2 1 2 1 1 1 1 ...
+##  $ animate   : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 1 2 1 2 1 1 2 1 1 1 ...
+##  $ text      : Factor w/ 2 levels &quot;absent&quot;,&quot;present&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ topleft   : Factor w/ 7 levels &quot;black&quot;,&quot;blue&quot;,..: 1 6 4 2 2 6 7 1 2 2 ...
+##  $ botright  : Factor w/ 8 levels &quot;black&quot;,&quot;blue&quot;,..: 5 7 8 7 7 1 2 7 2 2 ...</code></pre>
+<p>Las últimas 23 variables son características fisicas de las banderas, por lo que nos enfocaremos en estas. De estas 23 variables, 8 de estas son cuantitativas y el resto son cualitativas. Debido a que tenemos variables cualitativas utilizamos la distancia gower</p>
+<pre class="r"><code>D.flags &lt;- daisy(flags[,7:ncol(flags)], metric = &quot;gower&quot;)</code></pre>
+<p>Aplicaremos 3 algoritmos aglomerativos (single, average y complete) para luego comparar</p>
+<pre class="r"><code>res.single &lt;- hclust(d=D.flags, method = &quot;single&quot;)
+res.average &lt;-hclust(d=D.flags, method = &quot;average&quot;)
+res.complete &lt;-hclust(d=D.flags, method = &quot;complete&quot;)</code></pre>
+<p>Desde los gráficos podemos ver que el método single cae en el efecto cadena. Por lo que nos enfocaremos en los otros dos métodos.</p>
+<pre class="r"><code>par(mfrow=c(3 , 1))
+plot(res.single, labels = FALSE , main = &quot; Single&quot; )
+plot(res.average , labels = FALSE , main = &quot;Average&quot;)
+plot(res.complete , labels = FALSE , main = &quot; Complete&quot; )</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Desde el método average podemos en la altura aproximada de 0.30 podemos ver tres clusters grandes y algunos clusters pequeños, por lo que podemos aproximar a 3 clusters.</p>
+<p>Mediante la función cutree también podemos cortar el arbol mediante la altura. Notemos que cortando en <span class="math inline">\(h=0.32\)</span> encontramos 8 clusters, pero solo 3 son grandes</p>
+<pre class="r"><code>cl.ave &lt;- cutree(res.average , h = 0.32)
+table(cl.ave)</code></pre>
+<pre><code>## cl.ave
+##  1  2  3  4  5  6  7  8 
+## 78 85 17  6  3  3  1  1</code></pre>
+<p>Por lo que podemos mandar estos clusters atípicos a un cluster 0</p>
+<pre class="r"><code>cl.ave[cl.ave &gt; 3] &lt;- 0
+table(cl.ave)</code></pre>
+<pre><code>## cl.ave
+##  0  1  2  3 
+## 14 78 85 17</code></pre>
+<p>Desde el método complete es claro que hay 3 clusters.</p>
+<pre class="r"><code>cl.com &lt;- cutree(res.complete , k=3)
+table(cl.com)</code></pre>
+<pre><code>## cl.com
+##  1  2  3 
+## 71 74 49</code></pre>
+<p>Ahora comparamos los modelos para elegir el mejor. Primero comparemos ambos modelos entre sí con ICR. Luego utilizaremos la función <code>mapClass</code> del paquete <code>mclust</code>. Esta función toma dos valores <span class="math inline">\(a\)</span>,<span class="math inline">\(b\)</span> como vectores y retorna <span class="math inline">\(aTxb\)</span> y <span class="math inline">\(bTxa\)</span> (donde <span class="math inline">\(x\)</span> es el numero del cluster). La función retorna a que cluster de <span class="math inline">\(b\)</span> corresponde mas cercamente los valores de <span class="math inline">\(a\)</span> (para <span class="math inline">\(aTxb\)</span>, análogo para <span class="math inline">\(bTxa\)</span>)</p>
+<pre class="r"><code>adjustedRandIndex(cl.com , cl.ave)</code></pre>
+<pre><code>## [1] 0.3726202</code></pre>
+<pre class="r"><code>mapClass(cl.com , cl.ave )</code></pre>
+<pre><code>## $aTOb
+## $aTOb$`1`
+## [1] 1
+## 
+## $aTOb$`2`
+## [1] 2
+## 
+## $aTOb$`3`
+## [1] 2
+## 
+## 
+## $bTOa
+## $bTOa$`0`
+## [1] 2
+## 
+## $bTOa$`1`
+## [1] 1
+## 
+## $bTOa$`2`
+## [1] 2
+## 
+## $bTOa$`3`
+## [1] 3</code></pre>
+<p>Notamos que las dos soluciones parecen concordar entre sí, nos quedamos con el método complete linkage, por su simplicidad.</p>
+<p>Ahora analizaremos la bondad del ajuste mediante el test <span class="math inline">\(\chi^2\)</span>. Recordemos que la hipótesis nula del test es la independencia de los clusters</p>
+<pre class="r"><code>table(cl.com, flags$landmass)</code></pre>
+<pre><code>##       
+## cl.com N.America S.America Europe Africa Asia Oceania
+##      1         5         4      6     37   17       2
+##      2         8         9     23      9   16       9
+##      3        18         4      6      6    6       9</code></pre>
+<pre class="r"><code>chisq.test(cl.com , flags$landmass)$p.value</code></pre>
+<pre><code>## [1] 1.42892e-10</code></pre>
+<p>Debido a que el p-value es cercano a 0, los clusters son significantes para la variable landmass</p>
+<pre class="r"><code>table(cl.com, flags$language)</code></pre>
+<pre><code>##       
+## cl.com English Spanish French German Slavic Other Indo-European Chinese Arabic
+##      1      13       2     10      0      1                  12       1     13
+##      2      12       9      6      6      3                  10       2      5
+##      3      18      10      1      0      0                   8       1      1
+##       
+## cl.com Japanese/Turkish/Finnish/Magyar Others
+##      1                               1     18
+##      2                               2     19
+##      3                               1      9</code></pre>
+<pre class="r"><code>chisq.test(cl.com , flags$language)$p.value</code></pre>
+<pre><code>## [1] 0.0008972897</code></pre>
+<p>Debido a que el p-value es cercano a 0, los clusters son significantes para la variable language</p>
+<pre class="r"><code>table(cl.com ,flags$religion)</code></pre>
+<pre><code>##       
+## cl.com Catholic Other Christian Muslim Buddhist Hindu Ethnic Marxist Others
+##      1        7              13     23        2     2     18       5      1
+##      2       23              19     10        5     0      7       8      2
+##      3       10              28      3        1     2      2       2      1</code></pre>
+<pre class="r"><code>chisq.test(cl.com, flags$religion)$p.value</code></pre>
+<pre><code>## [1] 1.557342e-06</code></pre>
+<p>Debido a que el p-value es cercano a 0, los clusters son significantes para la variable religion.</p>
+<p>Ahora solo nos queda estudiar los clusters. Notemos que el cluster 1 se caracteriza principalmente por ser de religión musulmana y étnica y sus países provienen de África y Asia. En este grupo, observamos el porcentaje más alto de países de lengua árabe.</p>
+<p>Notamos que muchos países asiáticos dentro del cluster 1 son del área de Medio Oriente excepto China y Vietnam.</p>
+<pre class="r"><code>row.names(flags)[flags$landmass == &quot;Asia&quot; &amp; cl.com == 1]</code></pre>
+<pre><code>##  [1] &quot;Afghanistan&quot;  &quot;Bangladesh&quot;   &quot;China&quot;        &quot;Iran&quot;         &quot;Iraq&quot;        
+##  [6] &quot;Jordan&quot;       &quot;Kampuchea&quot;    &quot;Kuwait&quot;       &quot;North-Yemen&quot;  &quot;Oman&quot;        
+## [11] &quot;Pakistan&quot;     &quot;Saudi-Arabia&quot; &quot;Sri-Lanka&quot;    &quot;Syria&quot;        &quot;UAE&quot;         
+## [16] &quot;USSR&quot;         &quot;Vietnam&quot;</code></pre>
+<p>Por otro lado en el cluster 2 la mayoría de los paises asiáticos son del lejano oriente. La religión mas común es católica y otras cristianas, es el cluster con la mayor cantidad de países marxistas.</p>
+<pre class="r"><code>row.names(flags)[flags$landmass == &quot;Asia&quot; &amp; cl.com == 2]</code></pre>
+<pre><code>##  [1] &quot;Bahrain&quot;         &quot;Bhutan&quot;          &quot;Brunei&quot;          &quot;Burma&quot;          
+##  [5] &quot;Japan&quot;           &quot;Laos&quot;            &quot;Lebanon&quot;         &quot;Malaysia&quot;       
+##  [9] &quot;Maldive-Islands&quot; &quot;Mongolia&quot;        &quot;Singapore&quot;       &quot;South-Korea&quot;    
+## [13] &quot;South-Yemen&quot;     &quot;Taiwan&quot;          &quot;Thailand&quot;        &quot;Turkey&quot;</code></pre>
+<p>El tercer cluster contiene mayoritariamente países de América del norte. La mayoría de las religiones son otras cristianas. El lenguaje predominante es el inglés. Sin embargo hay países asiaticos.</p>
+<pre class="r"><code>row.names(flags)[flags$landmass == &quot;Asia&quot; &amp; cl.com == 3]</code></pre>
+<pre><code>## [1] &quot;Hong-Kong&quot;   &quot;India&quot;       &quot;Israel&quot;      &quot;Nepal&quot;       &quot;North-Korea&quot;
+## [6] &quot;Qatar&quot;</code></pre>
+<p>Tambien podemos ver la distribución de los colores de las banderas en cada cluster.</p>
+<pre class="r"><code>plot.data &lt;- matrix(NA,nrow=3,ncol = 7)
+rownames(plot.data) &lt;- c(&quot;Clus.1&quot;,&quot;Clus.2&quot;,&quot;Clus.3&quot;)
+colnames(plot.data) &lt;-rep(NA,7)
+cn &lt;- 0
+for(j in c(10:16)){
+  cn &lt;- cn + 1
+  counts &lt;- table(flags[,j],cl.com)
+  colnames(plot.data)[cn] &lt;- names(flags)[j]
+  plot.data[,cn] &lt;- prop.table(counts,2)[2,]*100
+}
+barplot(plot.data , col =gray.colors(3) ,
+border = &quot; white &quot; , beside = T ,legend = rownames( plot.data ) ,
+xlab = &quot;colours&quot; , ylab = &quot;percentage&quot; )</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+</div>
+<div id="caso-3-encuesta-profesores-universitarios" class="section level2">
+<h2><strong>Caso 3: Encuesta profesores universitarios</strong></h2>
+<p>El siguiente dataset <code>wiki4HE</code> del paquete <code>datasetsICR</code> contiene datos de una encuesta a 913 profesores universitarios sobre la persepción y el uso de wikipedia con fine didácticos. La encuesta contiene 53 variables.</p>
+<pre class="r"><code>data(&quot;wiki4HE&quot; )
+str(wiki4HE)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    913 obs. of  53 variables:
+##  $ AGE           : int  40 42 37 40 51 47 43 55 54 50 ...
+##  $ GENDER        : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ DOMAIN        : Factor w/ 7 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 6 5 5 7 5 5 7 2 5 ...
+##  $ PhD           : int  1 1 1 0 0 0 0 0 1 1 ...
+##  $ YEARSEXP      : Factor w/ 37 levels &quot;?&quot;,&quot;0&quot;,&quot;1&quot;,&quot;10&quot;,..: 8 12 7 7 36 11 5 6 8 20 ...
+##  $ UNIVERSITY    : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ UOC_POSITION  : Factor w/ 7 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 3 4 4 4 4 4 4 3 3 ...
+##  $ OTHER_POSITION: Factor w/ 3 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ OTHERSTATUS   : Factor w/ 8 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ USERWIKI      : Factor w/ 3 levels &quot;?&quot;,&quot;0&quot;,&quot;1&quot;: 2 2 2 2 3 2 2 2 2 2 ...
+##  $ PU1           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 3 3 4 5 3 5 5 5 5 ...
+##  $ PU2           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 4 3 4 4 3 5 5 5 5 ...
+##  $ PU3           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 4 3 5 6 4 5 6 6 5 ...
+##  $ PEU1          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 6 5 5 4 6 6 6 5 5 6 ...
+##  $ PEU2          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 6 5 5 4 5 5 1 4 6 6 ...
+##  $ PEU3          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 4 4 4 4 4 6 5 5 1 ...
+##  $ ENJ1          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 4 4 5 5 4 6 5 6 6 ...
+##  $ ENJ2          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 5 4 4 5 4 6 4 6 5 ...
+##  $ Qu1           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 5 3 4 5 4 5 4 5 5 ...
+##  $ Qu2           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 5 3 5 6 4 5 4 5 5 ...
+##  $ Qu3           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 4 3 4 5 4 5 4 3 5 ...
+##  $ Qu4           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 4 6 4 4 5 3 4 6 3 ...
+##  $ Qu5           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 3 4 4 5 5 5 5 4 4 ...
+##  $ Vis1          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 4 3 4 5 4 5 4 5 4 ...
+##  $ Vis2          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 4 4 5 5 5 5 4 4 1 ...
+##  $ Vis3          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 2 3 4 5 5 5 5 5 4 ...
+##  $ Im1           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 2 3 3 4 4 4 5 4 4 ...
+##  $ Im2           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 3 5 3 3 6 6 6 4 6 ...
+##  $ Im3           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 2 4 4 4 4 4 5 4 4 ...
+##  $ SA1           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 5 5 6 6 6 6 6 6 5 ...
+##  $ SA2           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 5 3 6 6 6 6 6 6 6 ...
+##  $ SA3           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 5 5 6 6 6 6 6 5 6 ...
+##  $ Use1          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 3 2 4 4 3 4 2 2 5 ...
+##  $ Use2          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 3 2 4 4 2 5 3 2 2 ...
+##  $ Use3          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 2 2 4 6 4 5 4 5 6 ...
+##  $ Use4          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 2 2 4 6 3 4 4 5 5 ...
+##  $ Use5          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 3 2 4 6 5 6 5 6 6 ...
+##  $ Pf1           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 2 4 5 6 5 5 5 2 3 ...
+##  $ Pf2           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 2 4 5 6 4 4 4 3 3 ...
+##  $ Pf3           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 2 4 5 6 3 4 5 4 5 ...
+##  $ JR1           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 5 5 6 4 5 6 5 4 5 ...
+##  $ JR2           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 4 4 5 4 2 5 5 3 5 ...
+##  $ BI1           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 3 2 4 6 5 4 4 5 6 ...
+##  $ BI2           : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 4 3 2 4 6 5 5 5 4 6 ...
+##  $ Inc1          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 6 5 6 4 6 6 5 4 6 6 ...
+##  $ Inc2          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 6 5 4 5 6 4 5 4 6 6 ...
+##  $ Inc3          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 6 4 6 5 5 3 5 4 5 6 ...
+##  $ Inc4          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 6 5 6 4 5 5 2 4 3 6 ...
+##  $ Exp1          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 3 3 5 6 5 5 5 6 5 ...
+##  $ Exp2          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 3 3 5 6 4 6 5 6 6 ...
+##  $ Exp3          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 5 5 3 4 6 5 6 4 6 3 ...
+##  $ Exp4          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 2 3 2 4 5 2 3 2 2 2 ...
+##  $ Exp5          : Factor w/ 6 levels &quot;?&quot;,&quot;1&quot;,&quot;2&quot;,&quot;3&quot;,..: 3 5 4 5 5 5 3 5 2 2 ...</code></pre>
+<p>Las primeras 10 variables son datos del entrevistado, por lo que no las consideraremos para el proceso de agrupamiento. Todas las variables toman valores en escala de Likert, es decir, toma los valores (1,2,3,4,5). Donde 1 es en desacuerdo/nunca y 5 es de acuerdo/siempre. Comúnmente en el análisis de datos se considera la escala de Likert como continua, bajo el supuesto de que hay una variable continua subyacente.</p>
+<p>El dataset contiene datos faltantes rellenos con <span class="math inline">\(?\)</span>, por lo que los llenamos con NA.</p>
+<pre class="r"><code>wiki4HE[ wiki4HE== &quot;?&quot; ] &lt;- NA
+as.numeric.factor&lt;- function(x){as.numeric(levels(x))[x]}
+
+for(nc in 11:53){wiki4HE[,nc] &lt;-as.numeric.factor(wiki4HE[,nc])}
+wiki4HE.all &lt;- wiki4HE[complete.cases(wiki4HE[,11:53]),11:53]
+dim(wiki4HE.all)</code></pre>
+<pre><code>## [1] 623  43</code></pre>
+<p>Las variables están en la misma unidad de medida por lo que no las estandarizamos.</p>
+<pre class="r"><code>D.wiki  &lt;- dist(wiki4HE.all)
+res.ward &lt;- hclust(d=D.wiki, method= &quot;ward.D2&quot;)
+plot(res.ward , labels= FALSE)</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p>Al ser tantos datos el dendrograma se vuelve engorroso, pero podemos darnos una idea del numero de clusters. El dendrograma nos da una idea de elegir entre 1 y 4 clusters, sin embargo esta elección debe basarse en datos cualitativos y/o estadísticos.</p>
+<p>Existe una función llamada <code>rect.hclust</code> en el paquete <code>stats</code> que nos permite encerrar en un rectángulo los clusters (solo para hclust). Por ejemplo si elegimos <span class="math inline">\(k=3\)</span></p>
+<pre class="r"><code>plot(res.ward, labels = FALSE)
+rect.hclust(res.ward , k=3)</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<p>Supongamos <span class="math inline">\(k=4\)</span>. Tambien podemos pintar solo algún cluster en específico</p>
+<pre class="r"><code>plot(res.ward, labels = FALSE)
+rect.hclust(res.ward , k=4, border = c(&quot;green&quot;,&quot;blue&quot;),which = c(2,4))</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<p>El paquete <code>NbClust</code> contiene varias medidas de validación para el número de clusters, en general es un paquete para determinar el mejor número de clusters</p>
+<pre class="r"><code>library(NbClust)
+res.nbclust &lt;- NbClust(data=wiki4HE.all, distance = &quot;euclidean&quot;,method=&quot;ward.D2&quot;, min.nc = 2 , max.nc = 15)</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<pre><code>## *** : The Hubert index is a graphical method of determining the number of clusters.
+##                 In the plot of Hubert index, we seek a significant knee that corresponds to a 
+##                 significant increase of the value of the measure i.e the significant peak in Hubert
+##                 index second differences plot. 
+## </code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-32-2.png" width="672" /></p>
+<pre><code>## *** : The D index is a graphical method of determining the number of clusters. 
+##                 In the plot of D index, we seek a significant knee (the significant peak in Dindex
+##                 second differences plot) that corresponds to a significant increase of the value of
+##                 the measure. 
+##  
+## ******************************************************************* 
+## * Among all indices:                                                
+## * 8 proposed 2 as the best number of clusters 
+## * 8 proposed 3 as the best number of clusters 
+## * 1 proposed 4 as the best number of clusters 
+## * 2 proposed 9 as the best number of clusters 
+## * 1 proposed 10 as the best number of clusters 
+## * 2 proposed 15 as the best number of clusters 
+## 
+##                    ***** Conclusion *****                            
+##  
+## * According to the majority rule, the best number of clusters is  2 
+##  
+##  
+## *******************************************************************</code></pre>
+<p>podemos ver los resultados de cada indicador nbclust</p>
+<pre class="r"><code>res.nbclust$Best.nc</code></pre>
+<pre><code>##                    KL       CH Hartigan     CCC    Scott       Marriot   TrCovW
+## Number_clusters 2.000   2.0000   3.0000  2.0000   3.0000  4.000000e+00      3.0
+## Value_Index     2.802 118.1267  22.1709 36.4757 386.7282 5.257584e+109 100183.3
+##                   TraceW Friedman   Rubin Cindex     DB Silhouette   Duda
+## Number_clusters   3.0000   3.0000  3.0000 10.000 2.0000     2.0000 9.0000
+## Value_Index     851.8762   9.7866 -0.4089  0.488 2.1048     0.1507 0.9247
+##                 PseudoT2 Beale Ratkowsky     Ball PtBiserial Frey McClain
+## Number_clusters   9.0000    NA    2.0000    3.000     3.0000    1  2.0000
+## Value_Index       9.7736    NA    0.2667 4689.593     0.3927   NA  0.6115
+##                    Dunn Hubert SDindex Dindex    SDbw
+## Number_clusters 15.0000      0  2.0000      0 15.0000
+## Value_Index      0.1871      0  1.0881      0  0.6651</code></pre>
+<p>Tambien podemos ver como quedo la partición con la mejor elección</p>
+<pre class="r"><code>table(res.nbclust$Best.partition)</code></pre>
+<pre><code>## 
+##   1   2 
+## 435 188</code></pre>
+<p>Obtenemos un grupo de tamaño extremadamente grande con más de dos tercios de las unidades. Desde un punto de vista cualitativo, esto a menudo es insatisfactorio y la solución involucrada a menudo se descarta.</p>
+<p>A continuación gráficamos las medias para cada variable</p>
+<pre class="r"><code>k &lt;- 2
+mean.cluster.2 &lt;- t( sapply( X = 1: k , FUN = function(nc) apply(wiki4HE.all[res.nbclust$Best.partition == nc , ] , 2 , mean)))
+plot(mean.cluster.2[1,], type = &quot;o&quot;, pch = 19, xlab = &quot;Variables&quot;, ylab = &quot;Cluster means&quot; , ylim = c(1,5),
+     axes = FALSE , col = &quot;blue&quot;, main = &quot;means&quot; )
+lines(mean.cluster.2[2,] , type = &quot;o&quot;, pch = 19 , col = &quot;red&quot;)
+axis(1, at = 1: ncol (mean.cluster.2) , lab = colnames(mean.cluster.2) , cex.axis = 0.5)
+axis(2, at = 1:5 , las = 1)
+legend(12 , 5 , c(&quot;Clus1&quot; , &quot;Clus2&quot;) , pch = 19 , cex = 0.7 , col = c( &quot;blue&quot; , &quot;red&quot; ))</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<p>Notamos que en promedio hay un comportamiento consistente en los clusters. Sin embargo en la pregunta 4 (Qu4) es atípica en el cluster 2. La pregunta es “En mi área de especialización, Wikipedia tiene una calidad inferior a otros recursos educativos”. Lo que puede estar pasando es que 2 clusters están generalizando, por lo que sería mejor probar con <span class="math inline">\(k=3\)</span>.</p>
+<p>Para <span class="math inline">\(k=3\)</span></p>
+<pre class="r"><code>table(cutree(res.ward,k=3))</code></pre>
+<pre><code>## 
+##   1   2   3 
+## 340 188  95</code></pre>
+<p>Notamos que el grupo grande se separó en 2 (grupo 1 y 3). Ahora graficamos</p>
+<pre class="r"><code>k &lt;- 3
+mean.cluster.3 &lt;- t( sapply( X = 1: k , FUN = function(nc) apply(wiki4HE.all[cutree(res.ward,k=3) == nc , ] , 2 , mean)))
+plot(mean.cluster.3[1,], type = &quot;o&quot;, pch = 19, xlab = &quot;Variables&quot;, ylab = &quot;Cluster means&quot; , ylim = c(1,5),
+     axes = FALSE , col = &quot;blue&quot;, main = &quot;means&quot; )
+lines(mean.cluster.3[2,] , type = &quot;o&quot;, pch = 19 , col = &quot;red&quot;)
+lines(mean.cluster.3[3,] , type = &quot;o&quot;, pch = 19 , col = &quot;darkgreen&quot;)
+axis(1, at = 1: ncol (mean.cluster.3) , lab = colnames(mean.cluster.3) , cex.axis = 0.5)
+axis(2, at = 1:5 , las = 1)
+legend(12 , 5 , c(&quot;Clus1&quot; , &quot;Clus2&quot;,&quot;Clus3&quot;) , pch = 19 , cex = 0.7 , col = c( &quot;blue&quot; , &quot;red&quot;, &quot;darkgreen&quot; ))</code></pre>
+<p><img src="mixtos_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<p>Al graficar podemos ver que el grupo verde identifica a los encuestados que están fuertemente a favor de utilizar Wikipedia como recurso didáctico. El grupo azul identifica a los encuestados que, en general, están a favor de utilizar Wikipedia como recurso didáctico pero que no participan activamente del blog. El color rojo son los que estàn menos de acuerdo con el uso de wikipedia como recurso didáctico.</p>
+<p><strong>Observación:</strong> Existen otros paquetes para validar el número de clusters como <code>fpc</code>, <code>factoextra</code> y <code>clValid</code></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
