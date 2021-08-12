@@ -16,8 +16,10 @@ navbar:
           href: divisivo.html
         - text: "hclust y agnes"
           href: hclust.html
-        - text: "DIANA y MOANA"
-          href: "diana.html"
+        - text: "R aglomerativo"
+          href: mixtos.html
+        - text: "R divisivo"
+          href: diana.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/

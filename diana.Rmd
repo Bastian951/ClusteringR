@@ -1,5 +1,128 @@
 ---
 title: "diana"
-output: html_document
 ---
 
+En esta sección analizaremos los algoritmos `diana` y `mona`. Recordemos que `diana` y `mona` son funciones del paquete. 
+
+## DIANA
+
+Utilizaremos el dataset customers, el cual contiene datos de clientes caracterizados por 6 variables continuas y 2 variables categóricas. 
+
+```{r}
+library(datasetsICR)
+data("customers")
+names(customers)
+```
+
+Para el análisis de cluster solo utilizaremos las variables continuas, las categoricas se utilizarán al final para la interpretación de los clusters. 
+
+Recordemos que DIANA parte como 1 cluster con $n$ variables, luego separa como nuevo cluster a la variable con la media mas grande.  
+
+```{r}
+apply(customers[ , 3:8] , 2 , mean )
+```
+En este caso la variable Fresh será el nuevo cluster. Utilizemos el algoritmo
+
+```{r}
+library(cluster)
+res.diana <- diana( x = customers[ , 3:8], diss = FALSE )
+```
+
+**Observación:** La clase del objeto res.diana es diana, la cual es una clase inherente de la clase `twins`, por lo que se comporta como agnes.
+
+```{r}
+plot(res.diana , main = "DIANA" , labels = FALSE , which.plots= 2)
+```
+
+Desde el dendrograma podemos ver 3 o 4 clusters. Probemos con $k=3$
+
+```{r}
+cluster.diana <- cutree(res.diana, k = 3)
+table(cluster.diana)
+```
+
+```{r}
+mean.cluster <- t(sapply(X=1:3, FUN = function(nc) apply(customers[cluster.diana == nc,3:8],2, mean)))
+
+rownames(mean.cluster) <- paste("Clus.", 1:3)
+round(mean.cluster, 2)
+```
+
+
+El Clúster 1 tiene el mayor tamaño e identifica a los clientes caracterizados por un perfil promedio de gasto. De hecho, los valores promedio del cluster 1 están muy cerca del promedio general. La peculiaridad de los clientes asignados al Grupo 2 es el gasto anual extremadamente alto para un subconjunto de tipos de productos como Detergentes, leche y abarrotes.
+Finalmente, el Cluster 3 incluye clientes con un gasto anual uniformemente alto para todos los tipos de bienes (mas altos que el promedio). 
+
+Con las variables categóricas podemos calcular el test de hipótesis. 
+
+
+```{r}
+table(cluster.diana , customers$Channel)
+```
+```{r}
+chisq.test(cluster.diana , customers$Channel)$p.value
+```
+```{r warning=FALSE}
+chisq.test(cluster.diana , customers$Region)$p.value
+```
+Los valores son cercanos a 0 por lo que rechazamos la hipotesis nula. Es decir los clusters no son independientes de las variables channel y religion. 
+
+## **MONA**
+
+Ahora utilizaremos el dataset `houseVotes` del paquete `fclust`. Este dataset contiene datos de votaciones a congresitas de Estados Unidos en 1984. Este dataframe contiene 16 variables cualitativos y 1 variable de clasificación. 
+
+```{r}
+library(fclust)
+data("houseVotes")
+names(houseVotes)
+
+level.drop <- droplevels(houseVotes, exclude="yn")
+houseVotesComplete <- level.drop[complete.cases(level.drop),]
+X.houseVotesComplete<- houseVotesComplete[,-1]
+```
+
+```{r}
+res.mona <- mona(x = X.houseVotesComplete)
+```
+
+La función mona retorna de forma engorrosa, por lo que podemos utilizar la siguiente función para obtener los datos de interes
+
+```{r}
+cluster.mona <- function(mona.obj, n.spl){
+  indices <- c()
+  results.vector<- c()
+
+  for(i in 1:n.spl){
+    indices <- append(indices, which(mona.obj$step == i))
+    }
+  sorted.indices <- sort(indices)
+  sorted.indices <- append(sorted.indices, length(mona.obj$order))
+  low <- 1
+
+  for (j in 1:2^n.spl){
+    high <- sorted.indices[j]
+    cluster.size <- length(mona.obj$order[low:high])
+    results.vector<- append(results.vector,rep(j,cluster.size))
+    print(paste ("Cluster = " , j , " ,count = ",cluster.size ) )
+    low <- high +1
+    }
+
+  df <- data.frame(order = mona.obj$order, results.vector = results.vector )
+  df <- df[order(df$order),]
+  return(df$results.vector)
+}
+```
+
+```{r}
+clus.mona <- cluster.mona(res.mona,1)
+```
+
+```{r}
+table(clus.mona , houseVotesComplete$class)
+```
+```{r warning=FALSE}
+library(mclust)
+adjustedRandIndex(clus.mona,
+houseVotesComplete$class)
+```
+
+Notemos que la partición obtenida por `MONA` no es muy buena. En este caso sería mejor probar con un algoritmo aglomerativo con $k=2$ y comparar. 
