@@ -20,6 +20,10 @@ navbar:
           href: mixtos.html
         - text: "R divisivo"
           href: diana.html
+    - text: "Cluster no jerárquico"
+      menu:
+        - text: "Introducción"
+          href: intronoj.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/
