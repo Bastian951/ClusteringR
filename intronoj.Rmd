@@ -40,4 +40,4 @@ plot(as.dendrogram(res), main = "Ward’smethod" )
 
 ```
 
-Notemos que en el primer paso se une la unidad 3 con la 4, por lo que no es posible llegar a la partición que queriamos. 
+Notemos que en el primer paso se une la unidad 3 con la unidad 4, por lo que no es posible llegar a la partición que queriamos. 
