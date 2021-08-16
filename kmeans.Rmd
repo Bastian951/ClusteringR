@@ -1,0 +1,223 @@
+---
+title: "**k-means**"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+K-means es uno de los algoritmos no jerarquicos mas usados. Puede ser usado cuando todas las variables son cuantitativas. Elige la mejor partición de $n$ unidades en $k$ clusters.  Para definir el concepto de la mejor partición  descomponemos la suma de cuadrados ($T$) en la suma de dos terminos. La suma de cuadrados dentro del cluster ($W$) y la suma de cuadrados entre los clusters ($B$).
+
+$$T = W+B$$
+
+- $\displaystyle T = \sum_{i=1}^n\sum_{j=1}^{p} (x_{ij}-\bar{x}_j)^2$
+- $\displaystyle W = \sum_{g=1}^k W_g$ con $\displaystyle  W_g = \sum_{i=1}^{n_g}\sum_{j=1}^p(x_{ij}-\bar{x}_{ij})^2$
+- $\displaystyle B = \sum_{g=1}^{k}n_g(\bar{x}_{gj}-\bar{x}_j)^2$
+
+$W$ permite evaluar la calidad de la partición, se sigue que la mejor partición se obtiene de 
+
+$$\min W$$ o de forma equivalente 
+
+$$\max B$$
+
+Se puede expresar de manera equivalente como un problema de optimización con restricciones.
+
+$$\min_{\mathbf{U,H}} \sum_{i=1}^n\sum_{g=1}^k\sum_{j=1}^p u_{ig}(x_{ij}-h_{gj})^2= \sum_{i=1}^n\sum_{g=1}^k u_{ig}d^2(\mathbf{x}_i, \mathbf{h}_g)$$
+
+$$sa \hspace{1cm} u_{ig} \in \{0,1 \},\hspace{1cm} i=1,2,\cdots,n \hspace{1cm} g = 1,2,\cdots, k$$
+
+$$\sum_{g=1}^k u_{ig} = 1,\hspace{1cm} i=1,2,\cdots,n $$
+
+Donde $U$ de orden $(n \times k)$ es una matriz binaria donde cada fila suma 1. La fila 
+$n$ toma el valor 1 en la columna $g$ si el valor $n-esimo$ pertenece al cluster $g$. La matriz $H$ es la matriz de centroides $(k \times p)$ con filas $(h_{g1},\cdots, h_{gp}), g=1,2,\cdots,k$. 
+
+La solución óptima se obtiene con el siguiente algoritmo iterativo
+
+1. Se eligen $k$ centroides (aleatoria o racionalmente). Es decir, se escoge la matriz de centroides $H$
+2. Dado $H$ se asigna a cada unidad el cluster que tiene distancia minima al centroide 
+
+$$u_{ig} = \left\{\begin{matrix}  \displaystyle 1,& \text{ si } g=arg\min_{g'=1,\cdots,k}\, d^2(\mathbf{x}_i, \mathbf{h}_{g'}) \\ 0, &\text{ otro caso }\end{matrix}\right.$$
+para $i=1,2,\cdots, n$ y $g=1,2,\cdots,k$.
+3. Dado $U$, calculamos los centroides
+
+$$h_g = \frac{\displaystyle \sum_{i=1}^n u_{ig}\mathbf{x}_i}{\displaystyle \sum_{i=1}^n u_{ig}}$$
+
+4. Repetimos los pasos 2 y 3 hasta que no haya cambios en 2 iteraciones. 
+
+Podemos relajar el criterio de convergencia fijando un número máximo de iteraciones. Notemos que la convergencia no asegura que encontramos la partición que minimiza $W$, por lo que es común realizar el algoritmo mas de una vez con distintas matrices iniciales. 
+
+La libreria mas famosa en $R$ que contiene `kmeans`es `stats`
+
+
+## **kmeans en R**
+
+Utilizaremos el dataset `NBA.48` que contiene estadísticas de la temporada regular del 2018-19.
+Suponemos que el manager está interesado en adquirir nuevos jugadores para la temporada siguiente y quiere tomar la decisión basandose en las estadisticas de los jugadores registrados durante esa temporada. Es decir, mediante clusters queremos encontrar los mejores jugadores en base a cierto criterio. 
+
+Los datos contienen estadisticas normalizadas por 48 minutos. Para el clustering consideraremos variables realizacionadas a la performance de los jugadores. Las variables puntos (PTS), intentos de tiros de campo (FGA), porcentaje de tiros de campo (FG.), intentos de tiros de campo de tres puntos (X3PA), porcentaje de tiros de campo de 3 puntos (X3P.), intento de tiros libre (FTA), porcentaje de tiros libre (FT.), rebote ofensivo (OREB), rebote defensivo (DREB), asistencia (AST), perdidas de balón (TOV), robos (STL) y bloqueos (BLK). Se eliminaron del analisis jugadores con menos de 12 minutos de participación para evitar valores atípicos. 
+
+
+```{r}
+library(datasetsICR)
+data("NBA.48")
+names(NBA.48)
+```
+
+```{r}
+NBA <- NBA.48[,c(1,8,10,11,13,14,16,17,18,19,21,22,23,24) ]
+data("NBA.game")
+NBA <- NBA[NBA.game$MIN >= 12,]
+row.names(NBA)<- NBA[,1]
+NBA <- NBA[,-1]
+str(NBA)
+```
+
+Ya que los valores tienen diferentes unidades de medida, estandarizaremos. 
+
+```{r}
+NBA.Z <- scale(NBA, center=TRUE, scale=TRUE)
+```
+
+
+No sabemos el numero de clusters, por lo que pondremos un mínimo de 2 y un máximo de 20. Haremos un plot de los valores $W$ para cada número de clusters. en la función `kmeans` el parametro `tot.withinss` permite obtener el valor de $W$ 
+
+```{r}
+n <- dim(NBA.Z)[1]
+k.min <- 2
+k.max <- 20
+wss <- numeric()
+wss[1] <- (n-1)*sum(apply(NBA.Z, 2, var))
+for(k in k.min : k.max){
+  wss[k] <- kmeans(NBA.Z, centers=k) $tot.withinss
+  }
+plot(1:k.max , wss, xlab = expression(italic(k)), ylab = expression(italic(W)), type = "b",
+     lwd = 2)
+```
+
+También podemos calcular las diferencias entre el cluster $k$ y $k+1$ con la función `diff`
+
+
+```{r}
+diff(wss)
+```
+Podemos iterar de nuevo para comprobar
+
+```{r}
+wss <- numeric()
+wss[1] <- (n-1)*sum(apply(NBA.Z,2,var))
+for(k in k.min:k.max){
+wss[k]<- kmeans(NBA.Z,k,nstart=50,iter.max = 1000)$tot.withinss}
+plot(1:k.max , wss,xlab = expression(italic(k)), ylab = expression(italic(W)),
+     type = "b",lwd = 2)
+```
+
+```{r}
+diff(wss)
+```
+
+Una forma de elegir el número de clusters es mediante la método del codo. Este método busca el valor $k$ que satisfaga que un incremento de $k$, no disminuya sustancialmente el valor de $W$, es decir, se forma una curva. En este caso podriamos elegir $k=3$. 
+
+Otro gráfico es el de $R^2$
+
+$$R^2 = 1- \frac{W}{T} = 1- \frac{B}{T}$$
+
+```{r}
+R2 <- 1 - wss/wss[1]
+plot(1:k.max, R2,xlab = expression(italic(k)),ylab = expression(italic(R^2)),
+     type = "b",lwd=2)
+```
+
+Luego por la regla del codo elegimos $k=3$. 
+
+Otra opción es el indice de Calinski y Harabasz o medida pseudo F, definida por 
+
+$$\displaystyle \frac{\displaystyle\frac{B}{k-1}}{\displaystyle \frac{W}{n-k}}$$
+
+El peak indica el número de clusters, de hecho largos valores de pseudo F identifica particiones bien separadas ($B$ grande) y clusters homogeneos ($W$ pequeño)
+
+```{r}
+bss <- wss[1] - wss
+pseudoF <- numeric()
+pseudoF[1] <- 0
+for(k in k.min:k.max){
+  pseudoF[k] <- (bss[k]/(k-1))/(wss[k]/(n-k))
+}
+plot(1:k.max , pseudoF ,xlab = expression(italic(k)),ylab = "pseudo F", type = "b" , lwd = 2)
+```
+
+Podemos ver peaks en 2 y en 3, por lo que podriamos considerar el rango 2-4 
+
+```{r}
+set.seed(2345)
+res.kmeans.2 <- kmeans(NBA.Z, centers = 2, nstart = 50 , iter.max = 1000)
+names(res.kmeans.2)
+```
+
+`totss` guarda el total de la suma de cuadrados $T$,  
+T ), `betweenss` guarda el valor de $B$, `tot.withinss` guarda el valor de $W$ y `withinss` guarda el valor `W_g` (por cluster). Tambien `size` guarda la cantidad de unidades por cluster. `cluster` retorna cada unidad con el numero de cluster correspondiente. 
+`centers` retorna una matriz con los centroides de cada fila. `iter`retorna el número de iteraciones necesarios para convergencia y `ifault` indica el número de problemas computacionales. 
+
+```{r}
+res.kmeans.2$size
+res.kmeans.2$withinss
+round(res.kmeans.2$centers, 2)
+```
+
+La solución con $k=2$ clusters, es bastante simplista. El cluster 2 se caracteriza por altos numeros de puntos, rebotes, perdidas de balón y bloqueos. Mientras el Cluster 1 detecta jugadores con un gran numero de asistencias y especialmente intentos de tiros de tres puntos y porcentajes. 
+
+Ahora vemos para $k=3$
+
+```{r}
+set.seed(2345)
+res.kmeans.3 <- kmeans(NBA.Z, centers = 3, nstart=50, iter.max=1000)
+res.kmeans.3$size 
+res.kmeans.3$withinss
+round(res.kmeans.3$centers , 2)
+```
+
+Debido a que es dificil interpretar los valores estandarizados, volveremos a los valores originales
+
+```{r}
+k <- 3
+res.kmeans.3$centers <- t(sapply(X=1:k,FUN=function(nc) apply(NBA[res.kmeans.3$cluster==nc,],
+2, mean)))
+rownames( res.kmeans.3$centers) <- 1: k
+round(res.kmeans.3$centers, 2)
+```
+
+Podemos obtener el mismo resultado con 
+
+```{r}
+round(aggregate(.~res.kmeans.3$cluster, data = NBA , FUN = mean )[ , -1] , 2)
+```
+
+
+Para $k=3$, 
+
+- En el cluster 1 vemos jugadores con altos tiros de campo, rebotes y bloqueos. Y valores no tan altos (pero no bajos) para intentos de tiros libres y perdida de balón. 
+- En el cluster 2 vemos jugadores con valores no muy altos (pero no bajos) en intentos de tiros de campo de tres puntos, en porcentaje de estos y tiros libres.
+- En el cluster 3 vemos jugadores con valores altos en puntos, en intentos de tiros de campo, en intento de tiros de campo de tres puntos, en el porcentaje de estos, en intentos de tiros libres, en el porcentaje de estos, en asistencias, en pérdidas de balón y en robos de balón. 
+
+
+Podemos graficar un boxplot para ver las tendencias centrales en cada cluster.
+
+
+```{r}
+par(mar=c(1,1,1,1))
+par(mfrow = c(5,3))
+for(j in 1:ncol(NBA)){
+  boxplot(NBA[, j]~res.kmeans.3$cluster,
+          xlab = "Cluster" , ylab = "",
+          col = colors()[c(110,121,130)],
+          main = names(NBA)[j])
+}
+
+barplot(table(res.kmeans.3$cluster),
+        xlab = "Cluster" , ylab = "" ,
+        col = colors()[c(110 , 121 , 130)] ,
+        main = "Cluster size")
+
+barplot( res.kmeans.3 $ withinss , xlab = "Cluster" , names.arg = 1:3 ,
+         col = colors()[c(110 , 121 , 130) ] ,
+         main = expression( italic(W[g])))
+```

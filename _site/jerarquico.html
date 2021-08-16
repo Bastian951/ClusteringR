@@ -286,6 +286,9 @@ $(document).ready(function () {
     <li>
       <a href="intronoj.html">Introducción</a>
     </li>
+    <li>
+      <a href="kmeans.html">kmeans</a>
+    </li>
   </ul>
 </li>
       </ul>
@@ -368,26 +371,26 @@ daisy(X, metric=&quot;euclidean&quot;)</code></pre>
 <pre><code>## [1] 0 4 4</code></pre>
 <p>Otro paquete que contiene la función mahalanobis es <code>mahalanobis.dist</code> del paquete <code>StatMatch</code>. Esta función si nos retorna una matriz de similitud</p>
 <pre class="r"><code>library(StatMatch)</code></pre>
-<pre><code>## Loading required package: proxy</code></pre>
+<pre><code>## 필요한 패키지를 로딩중입니다: proxy</code></pre>
 <pre><code>## 
-## Attaching package: &#39;proxy&#39;</code></pre>
+## 다음의 패키지를 부착합니다: &#39;proxy&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
 ## 
 ##     as.dist, dist</code></pre>
 <pre><code>## The following object is masked from &#39;package:base&#39;:
 ## 
 ##     as.matrix</code></pre>
-<pre><code>## Loading required package: survey</code></pre>
-<pre><code>## Loading required package: grid</code></pre>
-<pre><code>## Loading required package: Matrix</code></pre>
-<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## 필요한 패키지를 로딩중입니다: survey</code></pre>
+<pre><code>## 필요한 패키지를 로딩중입니다: grid</code></pre>
+<pre><code>## 필요한 패키지를 로딩중입니다: Matrix</code></pre>
+<pre><code>## 필요한 패키지를 로딩중입니다: survival</code></pre>
 <pre><code>## 
-## Attaching package: &#39;survey&#39;</code></pre>
+## 다음의 패키지를 부착합니다: &#39;survey&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:graphics&#39;:
 ## 
 ##     dotchart</code></pre>
-<pre><code>## Loading required package: lpSolve</code></pre>
-<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## 필요한 패키지를 로딩중입니다: lpSolve</code></pre>
+<pre><code>## 필요한 패키지를 로딩중입니다: ggplot2</code></pre>
 <pre class="r"><code>mahalanobis.dist(X,vc=var(X))</code></pre>
 <pre><code>##      [,1] [,2] [,3]
 ## [1,]    0    2    2

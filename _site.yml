@@ -24,6 +24,8 @@ navbar:
       menu:
         - text: "Introducción"
           href: intronoj.html
+        - text: "kmeans"
+          href: kmeans.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/
