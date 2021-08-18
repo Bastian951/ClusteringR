@@ -221,3 +221,12 @@ barplot( res.kmeans.3 $ withinss , xlab = "Cluster" , names.arg = 1:3 ,
          col = colors()[c(110 , 121 , 130) ] ,
          main = expression( italic(W[g])))
 ```
+
+## Plotear kmeans
+
+Para plotear utilizaremos la libreria `factoextra`
+
+```{r message=FALSE, warning=FALSE}
+
+```
+

@@ -58,10 +58,10 @@ Con las variables categóricas podemos calcular el test de hipótesis.
 ```{r}
 table(cluster.diana , customers$Channel)
 ```
-```{r}
+```{r message=FALSE, warning=FALSE}
 chisq.test(cluster.diana , customers$Channel)$p.value
 ```
-```{r warning=FALSE}
+```{r message=FALSE, warning=FALSE}
 chisq.test(cluster.diana , customers$Region)$p.value
 ```
 Los valores son cercanos a 0 por lo que rechazamos la hipotesis nula. Es decir los clusters no son independientes de las variables channel y religion. 

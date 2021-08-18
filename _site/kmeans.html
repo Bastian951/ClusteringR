@@ -254,25 +254,25 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="intro.html">Introducción</a>
+      <a href="_site/intro.html">Introducción</a>
     </li>
     <li>
-      <a href="jerarquico.html">Cluster Jerárquico</a>
+      <a href="_site/jerarquico.html">Cluster Jerárquico</a>
     </li>
     <li>
-      <a href="aglomerativo.html">Jerárquico aglomerativo</a>
+      <a href="_site/aglomerativo.html">Jerárquico aglomerativo</a>
     </li>
     <li>
-      <a href="divisivo.html">Jerárquico divisivo</a>
+      <a href="_site/divisivo.html">Jerárquico divisivo</a>
     </li>
     <li>
-      <a href="hclust.html">hclust y agnes</a>
+      <a href="_site/hclust.html">hclust y agnes</a>
     </li>
     <li>
-      <a href="mixtos.html">R aglomerativo</a>
+      <a href="_site/mixtos.html">R aglomerativo</a>
     </li>
     <li>
-      <a href="diana.html">R divisivo</a>
+      <a href="_site/diana.html">R divisivo</a>
     </li>
   </ul>
 </li>
@@ -284,10 +284,10 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="intronoj.html">Introducción</a>
+      <a href="_site/intronoj.html">Introducción</a>
     </li>
     <li>
-      <a href="kmeans.html">kmeans</a>
+      <a href="_site/kmeans.html">kmeans</a>
     </li>
   </ul>
 </li>
@@ -387,10 +387,10 @@ plot(1:k.max , wss, xlab = expression(italic(k)), ylab = expression(italic(W)), 
 <p><img src="kmeans_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>También podemos calcular las diferencias entre el cluster <span class="math inline">\(k\)</span> y <span class="math inline">\(k+1\)</span> con la función <code>diff</code></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.56508  -724.36690  -249.80487  -251.27790  -212.04021   -56.97471
-##  [7]  -120.05784  -100.55624   -38.76407   -99.51538   -39.04611   -38.30111
-## [13]   -79.00934   -26.34309   -28.02074   -86.65520    10.34581   -65.58351
-## [19]   -23.94396</code></pre>
+<pre><code>##  [1] -1259.565083  -724.271315  -251.827311  -249.052199  -212.339046
+##  [6]   -93.838026  -130.778092    -8.661296   -91.870276   -48.087434
+## [11]   -98.659503   -63.842535   -15.294875   -61.991972   -36.602161
+## [16]   -45.578197   -48.507720   -17.927344   -17.899519</code></pre>
 <p>Podemos iterar de nuevo para comprobar</p>
 <pre class="r"><code>wss &lt;- numeric()
 wss[1] &lt;- (n-1)*sum(apply(NBA.Z,2,var))
@@ -400,10 +400,10 @@ plot(1:k.max , wss,xlab = expression(italic(k)), ylab = expression(italic(W)),
      type = &quot;b&quot;,lwd = 2)</code></pre>
 <p><img src="kmeans_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.38876  -210.40894  -118.43526
-##  [7]  -104.23790   -79.64078   -70.90259   -63.36298   -66.03937   -37.55691
-## [13]   -48.43344   -48.12432   -42.17620   -30.41309   -37.34454   -32.46120
-## [19]   -32.24749</code></pre>
+<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.41215  -210.38554  -118.43526
+##  [7]  -106.18085   -77.85992   -69.85838   -70.64391   -49.59213   -45.61621
+## [13]   -48.89969   -56.94585   -27.81171   -35.13289   -44.09141   -37.45928
+## [19]   -23.44295</code></pre>
 <p>Una forma de elegir el número de clusters es mediante la método del codo. Este método busca el valor <span class="math inline">\(k\)</span> que satisfaga que un incremento de <span class="math inline">\(k\)</span>, no disminuya sustancialmente el valor de <span class="math inline">\(W\)</span>, es decir, se forma una curva. En este caso podriamos elegir <span class="math inline">\(k=3\)</span>.</p>
 <p>Otro gráfico es el de <span class="math inline">\(R^2\)</span></p>
 <p><span class="math display">\[R^2 = 1- \frac{W}{T} = 1- \frac{B}{T}\]</span></p>
@@ -493,6 +493,10 @@ barplot( res.kmeans.3 $ withinss , xlab = &quot;Cluster&quot; , names.arg = 1:3 
          col = colors()[c(110 , 121 , 130) ] ,
          main = expression( italic(W[g])))</code></pre>
 <p><img src="kmeans_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+</div>
+<div id="plotear-kmeans" class="section level2">
+<h2>Plotear kmeans</h2>
+<p>Para plotear utilizaremos la libreria <code>factoextra</code></p>
 </div>
 
 
