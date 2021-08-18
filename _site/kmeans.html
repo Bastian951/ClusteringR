@@ -254,25 +254,25 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="_site/intro.html">Introducción</a>
+      <a href="intro.html">Introducción</a>
     </li>
     <li>
-      <a href="_site/jerarquico.html">Cluster Jerárquico</a>
+      <a href="jerarquico.html">Cluster Jerárquico</a>
     </li>
     <li>
-      <a href="_site/aglomerativo.html">Jerárquico aglomerativo</a>
+      <a href="aglomerativo.html">Jerárquico aglomerativo</a>
     </li>
     <li>
-      <a href="_site/divisivo.html">Jerárquico divisivo</a>
+      <a href="divisivo.html">Jerárquico divisivo</a>
     </li>
     <li>
-      <a href="_site/hclust.html">hclust y agnes</a>
+      <a href="hclust.html">hclust y agnes</a>
     </li>
     <li>
-      <a href="_site/mixtos.html">R aglomerativo</a>
+      <a href="mixtos.html">R aglomerativo</a>
     </li>
     <li>
-      <a href="_site/diana.html">R divisivo</a>
+      <a href="diana.html">R divisivo</a>
     </li>
   </ul>
 </li>
@@ -284,10 +284,10 @@ $(document).ready(function () {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="_site/intronoj.html">Introducción</a>
+      <a href="intronoj.html">Introducción</a>
     </li>
     <li>
-      <a href="_site/kmeans.html">kmeans</a>
+      <a href="kmeans.html">kmeans</a>
     </li>
   </ul>
 </li>
@@ -387,10 +387,10 @@ plot(1:k.max , wss, xlab = expression(italic(k)), ylab = expression(italic(W)), 
 <p><img src="kmeans_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>También podemos calcular las diferencias entre el cluster <span class="math inline">\(k\)</span> y <span class="math inline">\(k+1\)</span> con la función <code>diff</code></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.565083  -724.271315  -251.827311  -249.052199  -212.339046
-##  [6]   -93.838026  -130.778092    -8.661296   -91.870276   -48.087434
-## [11]   -98.659503   -63.842535   -15.294875   -61.991972   -36.602161
-## [16]   -45.578197   -48.507720   -17.927344   -17.899519</code></pre>
+<pre><code>##  [1] -1259.56508  -724.27131  -251.85442  -242.88719  -205.33042   -81.03404
+##  [7]  -120.55851   -84.94323   -63.82986   -85.61904   -28.92079   -50.48236
+## [13]   -90.06415   -37.19617   -19.48506   -28.03347   -52.52198   -35.98180
+## [19]   -26.75374</code></pre>
 <p>Podemos iterar de nuevo para comprobar</p>
 <pre class="r"><code>wss &lt;- numeric()
 wss[1] &lt;- (n-1)*sum(apply(NBA.Z,2,var))
@@ -400,10 +400,10 @@ plot(1:k.max , wss,xlab = expression(italic(k)), ylab = expression(italic(W)),
      type = &quot;b&quot;,lwd = 2)</code></pre>
 <p><img src="kmeans_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.41215  -210.38554  -118.43526
-##  [7]  -106.18085   -77.85992   -69.85838   -70.64391   -49.59213   -45.61621
-## [13]   -48.89969   -56.94585   -27.81171   -35.13289   -44.09141   -37.45928
-## [19]   -23.44295</code></pre>
+<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.41215  -210.38554  -118.53340
+##  [7]  -106.08272   -78.09551   -70.67671   -67.26422   -60.80116   -40.43573
+## [13]   -52.01076   -49.98867   -27.74398   -41.18873   -37.44303   -28.97292
+## [19]   -28.49926</code></pre>
 <p>Una forma de elegir el número de clusters es mediante la método del codo. Este método busca el valor <span class="math inline">\(k\)</span> que satisfaga que un incremento de <span class="math inline">\(k\)</span>, no disminuya sustancialmente el valor de <span class="math inline">\(W\)</span>, es decir, se forma una curva. En este caso podriamos elegir <span class="math inline">\(k=3\)</span>.</p>
 <p>Otro gráfico es el de <span class="math inline">\(R^2\)</span></p>
 <p><span class="math display">\[R^2 = 1- \frac{W}{T} = 1- \frac{B}{T}\]</span></p>

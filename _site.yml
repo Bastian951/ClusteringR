@@ -7,25 +7,25 @@ navbar:
     - text: "Cluster jerárquico"
       menu:
         - text: "Introducción"
-          href: _site/intro.html
+          href: intro.html
         - text: "Cluster Jerárquico"
-          href: _site/jerarquico.html
+          href: jerarquico.html
         - text: "Jerárquico aglomerativo"
-          href: _site/aglomerativo.html
+          href: aglomerativo.html
         - text: "Jerárquico divisivo"
-          href: _site/divisivo.html
+          href: divisivo.html
         - text: "hclust y agnes"
-          href: _site/hclust.html
+          href: hclust.html
         - text: "R aglomerativo"
-          href: _site/mixtos.html
+          href: mixtos.html
         - text: "R divisivo"
-          href: _site/diana.html
+          href: diana.html
     - text: "Cluster no jerárquico"
       menu:
         - text: "Introducción"
-          href: _site/intronoj.html
+          href: intronoj.html
         - text: "kmeans"
-          href: _site/kmeans.html
+          href: kmeans.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/
