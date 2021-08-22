@@ -11,7 +11,7 @@
 
 
 
-<title>Introducción</title>
+<title>k-Medoids</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -311,31 +311,71 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Introducción</h1>
+<h1 class="title toc-ignore"><strong>k-Medoids</strong></h1>
 
 </div>
 
 
-<p>El análisis <span style="color:blue">Cluster</span> (Clustering) comprende una larga clase de métodos con el objetivo de descubrir grupos significantes en los datos. El propósito es identificar <span class="math inline">\(k\)</span> grupos con (<span class="math inline">\(k &lt;&lt; n\)</span>) tal que</p>
-<div class="alert alert-dismissible alert-info">
+<p>A diferencia de k-means, k-medoids no utiliza el centroide, si no que utiliza los medoides. Un medoide puede ser definido como el objeto de un grupo cuya disimilaridad media a todos los objetos en el grupo es mínima. Calcular los medoides es mas caro que calcular los centroides.</p>
+<p><span class="math display">\[\min_{\mathbf{U,H}} \sum_{i=1}^n\sum_{g=1}^k u_{ig}d^2(\mathbf{x}_i, \mathbf{h}_g)\]</span> <span class="math display">\[st\hspace{0.5cm} u_{ig}\in \{0,1\}, \hspace{0.5cm}i=\{1,\cdots,n\}, \hspace{0.5cm}g=\{1,\cdots,n\}\]</span></p>
+<p><span class="math display">\[\sum_{g=1}^k u_{ig}=1, \hspace{0.5cm}i=\{1,\cdots,n\}\]</span></p>
+<p><span class="math display">\[\{h_1,\cdots,h_g,\cdots,h_k \} \subseteq \{ x_1, \cdots, x_i,\cdots,x_n\}\]</span></p>
 <ol style="list-style-type: decimal">
-<li><p>Todo grupo contenga al menos 1 elemento</p></li>
-<li><p>Grupos disjuntos.</p></li>
+<li>Escoger <span class="math inline">\(k\)</span> medoides aleatorios. Es decir, escoger una matriz <span class="math inline">\(H\)</span></li>
+<li>Dada la matriz <span class="math inline">\(H\)</span>, asignando cada unidad al cluster tal que la distancia el medoide es minima.</li>
 </ol>
+<p><span class="math display">\[u_{ig} = \left\{\begin{matrix}  \displaystyle 1,&amp; \text{ si } g=arg\min_{g&#39;=1,\cdots,k}\, d^2(\mathbf{x}_i, \mathbf{h}_{g&#39;}) \\ 0, &amp;\text{ otro caso }\end{matrix}\right.\]</span></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Dada la matriz <span class="math inline">\(U\)</span>, computar los medoides</li>
+</ol>
+<p><span class="math display">\[h_g = arg\min_{i=1,\cdots,n} \sum_{i&#39;=1}^n u_{ig}d^2(x_i,x_{i&#39;}), \hspace{1cm}g=1,\cdots,k\]</span> 4. Repetir pasos 2 y 3 hasta que no hayan cambios en 2 iteraciones.</p>
+<p>El algoritmo de clustering k-medoids es tambien conocida como el algoritmo <code>PAM</code> (partitioning around medoids)</p>
+<div id="pam-en-libraria-cluster" class="section level2">
+<h2>PAM en libraria cluster</h2>
+<pre class="r"><code>library(datasetsICR)
+data(&quot;NBA.48&quot;)
+NBA &lt;- NBA.48[,c(1,8,10,11,13,14,16,17,18,19,21,22,23,24)]
+
+data(&quot;NBA.game&quot;)
+NBA &lt;- NBA[NBA.game$MIN &gt;= 12,]
+row.names(NBA) &lt;- NBA[,1]
+NBA &lt;- NBA[ , -1]</code></pre>
+<pre class="r"><code>library(cluster)
+res.pam.3 &lt;- pam(x = NBA, k = 3, stand = TRUE)</code></pre>
+<pre class="r"><code>names(res.pam.3)</code></pre>
+<pre><code>##  [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
+##  [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;       &quot;data&quot;</code></pre>
+<pre class="r"><code>res.pam.3$medoids</code></pre>
+<pre><code>##                  PTS  FGA  FG. X3PA X3P. FTA  FT. OREB DREB AST TOV STL BLK
+## Cedi Osman      19.5 16.6 42.7  7.3 34.8 3.6 77.9  0.9  6.1 3.8 2.2 1.2 0.2
+## Cody Zeller     19.2 13.3 55.1  0.8 27.3 5.4 78.7  4.2  8.6 3.9 2.4 1.5 1.6
+## Emmanuel Mudiay 26.1 22.1 44.6  6.3 32.9 5.6 77.4  1.0  4.9 6.8 4.2 1.3 0.6</code></pre>
+<pre class="r"><code>res.pam.3$clusinfo</code></pre>
+<pre><code>##      size  max_diss  av_diss diameter separation
+## [1,]  226 11.359254 3.300690 14.46731   1.265893
+## [2,]   95  9.187339 4.623588 12.39399   1.309079
+## [3,]   82  9.330624 3.851973 12.54901   1.265893</code></pre>
+<p>Comparemos con k-means</p>
+<pre class="r"><code>NBA.Z &lt;- scale(NBA, center=TRUE, scale=TRUE)</code></pre>
+<pre class="r"><code>res.kmeans.3 &lt;- kmeans(NBA.Z, centers = 3, nstart=50, iter.max=1000)</code></pre>
+<pre class="r"><code>table(res.pam.3$clustering, res.kmeans.3$cluster)</code></pre>
+<pre><code>##    
+##       1   2   3
+##   1 210   0  16
+##   2  10  80   5
+##   3   6   0  76</code></pre>
+<pre class="r"><code>library(mclust)
+adjustedRandIndex(res.pam.3$clustering, res.kmeans.3$cluster)</code></pre>
+<pre><code>## [1] 0.7407294</code></pre>
+<pre class="r"><code>library(factoextra)</code></pre>
+<pre class="r"><code>fviz_cluster(res.pam.3, data = NBA,
+             palette = c(&quot;#2E9FDF&quot;, &quot;#00AFBB&quot;, &quot;#E7B800&quot;), 
+             geom = &quot;point&quot;,
+             ellipse.type = &quot;convex&quot;, 
+             ggtheme = theme_bw()
+             )</code></pre>
+<p><img src="pam_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
-<p>Lo anterior define una partición de <span class="math inline">\(n\)</span> unidades en <span class="math inline">\(k\)</span> grupos. Un grupo es significante si sus unidades son similares.</p>
-<p>Uno de los problemas es que no tenemos conocimiento a priori de la existencia y del numero de grupos. De hecho los clusters son sugeridos de forma bastante natural por los datos siguiendo el supuesto implicito de que existe algun tipo de homogeneidad y separación en el conjunto de datos</p>
-<p>Existen tres puntos importantes:</p>
-<ul>
-<li>El primero es la elección de las variables a considerar para los propositos de clustering.</li>
-<li>El segundo es el preprocesamiento de los datos.</li>
-<li>El tercero es la medida de similaridad o disimilaridad. Esta dependera del problema.</li>
-</ul>
-<p>Generalmente se pueden realizar varios analisis cluster para ver y comparar resultados.</p>
-<p>Los métodos de agrupación que pertenecen al enfoque estándar se pueden dividir en métodos jerárquicos y no jerárquicos.</p>
-<p>Metodos no jerarquicos descubren la mejor partición de <span class="math inline">\(n\)</span> unidades en <span class="math inline">\(k\)</span> clusters de acuerdo a la minimización de una función de costos. Por lo tanto, solo se obtiene una partición.</p>
-<p>Los metodos jerarquicos producen una serie de particiones donde en cada paso o dos grupos se fusionan (agrupamiento jerárquico aglomerativo) o un grupo se divide en dos grupos (agrupamiento jerárquico divisivo) de acuerdo con un criterio dado</p>
-<p>Los metodos jerarquicos se denominan clusters rigidos. Los clusters basados en modelos o fuzzy se dicen suaves.</p>
 
 
 

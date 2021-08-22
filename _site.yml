@@ -26,6 +26,8 @@ navbar:
           href: intronoj.html
         - text: "kmeans"
           href: kmeans.html
+        - text: "k-medoids"
+          href: pam.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/

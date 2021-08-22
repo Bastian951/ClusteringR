@@ -1,0 +1,94 @@
+---
+title: "**k-Medoids**"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+A diferencia de k-means, k-medoids no utiliza el centroide, si no que utiliza los medoides. Un medoide puede ser definido como el objeto de un grupo cuya disimilaridad media a todos los objetos en el grupo es mínima. Calcular los medoides es mas caro que calcular los centroides. 
+
+$$\min_{\mathbf{U,H}} \sum_{i=1}^n\sum_{g=1}^k u_{ig}d^2(\mathbf{x}_i, \mathbf{h}_g)$$
+$$st\hspace{0.5cm} u_{ig}\in \{0,1\}, \hspace{0.5cm}i=\{1,\cdots,n\}, \hspace{0.5cm}g=\{1,\cdots,n\}$$ 
+
+$$\sum_{g=1}^k u_{ig}=1, \hspace{0.5cm}i=\{1,\cdots,n\}$$
+
+$$\{h_1,\cdots,h_g,\cdots,h_k \} \subseteq \{ x_1, \cdots, x_i,\cdots,x_n\}$$
+
+1. Escoger $k$ medoides aleatorios. Es decir, escoger una matriz $H$
+2. Dada la matriz $H$, asignando cada unidad al cluster tal que la distancia el medoide es minima.
+
+$$u_{ig} = \left\{\begin{matrix}  \displaystyle 1,& \text{ si } g=arg\min_{g'=1,\cdots,k}\, d^2(\mathbf{x}_i, \mathbf{h}_{g'}) \\ 0, &\text{ otro caso }\end{matrix}\right.$$
+
+3. Dada la matriz $U$, computar los medoides
+
+$$h_g = arg\min_{i=1,\cdots,n} \sum_{i'=1}^n u_{ig}d^2(x_i,x_{i'}), \hspace{1cm}g=1,\cdots,k$$
+4. Repetir pasos 2 y 3 hasta que no hayan cambios en 2 iteraciones. 
+
+
+El algoritmo de clustering k-medoids es tambien conocida como el algoritmo `PAM` (partitioning around medoids)
+
+## PAM en libraria cluster
+
+```{r}
+library(datasetsICR)
+data("NBA.48")
+NBA <- NBA.48[,c(1,8,10,11,13,14,16,17,18,19,21,22,23,24)]
+
+data("NBA.game")
+NBA <- NBA[NBA.game$MIN >= 12,]
+row.names(NBA) <- NBA[,1]
+NBA <- NBA[ , -1]
+```
+
+
+```{r}
+library(cluster)
+res.pam.3 <- pam(x = NBA, k = 3, stand = TRUE)
+```
+
+```{r}
+names(res.pam.3)
+```
+
+```{r}
+res.pam.3$medoids
+```
+```{r}
+res.pam.3$clusinfo
+```
+
+Comparemos con k-means
+
+```{r}
+NBA.Z <- scale(NBA, center=TRUE, scale=TRUE)
+```
+
+
+```{r}
+res.kmeans.3 <- kmeans(NBA.Z, centers = 3, nstart=50, iter.max=1000)
+```
+
+```{r}
+table(res.pam.3$clustering, res.kmeans.3$cluster)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(mclust)
+adjustedRandIndex(res.pam.3$clustering, res.kmeans.3$cluster)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(factoextra)
+```
+
+```{r message=FALSE, warning=FALSE}
+fviz_cluster(res.pam.3, data = NBA,
+             palette = c("#2E9FDF", "#00AFBB", "#E7B800"), 
+             geom = "point",
+             ellipse.type = "convex", 
+             ggtheme = theme_bw()
+             )
+```
+
