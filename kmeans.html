@@ -390,10 +390,10 @@ plot(1:k.max , wss, xlab = expression(italic(k)), ylab = expression(italic(W)), 
 <p><img src="kmeans_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>También podemos calcular las diferencias entre el cluster <span class="math inline">\(k\)</span> y <span class="math inline">\(k+1\)</span> con la función <code>diff</code></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.565083  -724.366896  -273.292642   -60.853821  -307.891875
-##  [6]  -176.601606   -99.588823   -25.929129  -138.709183   -39.509719
-## [11]   -82.489951   -36.495069     6.475489   -97.137585   -27.434810
-## [16]   -35.823636   -19.540513   -31.457261   -70.319614</code></pre>
+<pre><code>##  [1] -1259.56508  -724.36690  -249.80487   -58.33677  -330.66158  -141.12877
+##  [7]  -157.80711   -43.04771   -81.78181   -67.22368   -32.59168   -63.09812
+## [13]   -55.62546   -53.51368   -18.83269   -53.28557   -31.13160   -51.50089
+## [19]   -13.03319</code></pre>
 <p>Podemos iterar de nuevo para comprobar</p>
 <pre class="r"><code>wss &lt;- numeric()
 wss[1] &lt;- (n-1)*sum(apply(NBA.Z,2,var))
@@ -403,10 +403,10 @@ plot(1:k.max , wss,xlab = expression(italic(k)), ylab = expression(italic(W)),
      type = &quot;b&quot;,lwd = 2)</code></pre>
 <p><img src="kmeans_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.41215  -210.38554  -118.53340
-##  [7]  -106.08272   -75.39740   -72.32090   -68.31813   -62.60855   -43.79449
-## [13]   -49.51078   -40.85507   -41.45417   -22.31656   -46.10873   -32.97665
-## [19]   -33.89448</code></pre>
+<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.41215  -210.38554  -118.43526
+##  [7]  -106.18085   -78.09551   -68.41416   -70.97589   -50.53107   -60.04156
+## [13]   -44.17354   -42.17304   -40.40817   -32.31792   -31.02639   -41.71204
+## [19]   -30.90546</code></pre>
 <p>Una forma de elegir el número de clusters es mediante la método del codo. Este método busca el valor <span class="math inline">\(k\)</span> que satisfaga que un incremento de <span class="math inline">\(k\)</span>, no disminuya sustancialmente el valor de <span class="math inline">\(W\)</span>, es decir, se forma una curva. En este caso podriamos elegir <span class="math inline">\(k=3\)</span>.</p>
 <p>Otro gráfico es el de <span class="math inline">\(R^2\)</span></p>
 <p><span class="math display">\[R^2 = 1- \frac{W}{T} = 1- \frac{B}{T}\]</span></p>
