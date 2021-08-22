@@ -14,3 +14,5 @@ En este R notebook encontrarás un apunte de Clustering en R
 - Clustering Jerarquico
 
 - Clustering no Jerarquico 
+
+- Fuzzy Clustering

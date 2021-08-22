@@ -1,0 +1,167 @@
+---
+title: "**Fuzzy K-means**"
+output: html_document
+---
+En el clustering jerárquico y no jerárquico cada unidad pertenecia a un solo cluster. En el Fuzzy clustering esto no es así. Notemos el siguiente gráfico donde la unidad 8 está entre dos clusters
+
+```{r}
+library(datasetsICR)
+data("butterfly")
+plot(butterfly , type = "n")
+text(butterfly, labels=1:15)
+```
+
+
+El clustering Fuzzy consiste en asignar cada unidad a clusters con grados de pertenencia (difusos) tomando valores en el intervalo [0, 1]
+
+## **Fuzzy K-means o Fuzzy C-means**
+
+El propósito del algoritmo Fuzzy K-means (FKM o FCM) es encontrar la mejor partición fuzzy de $n$ unidades en $k$ clusters. El parámetro $m$ se utiliza para ajustar la borrosidad de la partición obtenida ($m> 1$)
+
+$$\min_{U,H} J_{FKM} = \sum_{i=1}^n\sum_{g=1}^k u_{ig}^md^2(\bf{x}_i,\bf{h}_g)$$
+
+$$ST\hspace{1cm} u_{ig}\in[0,1], \hspace{1cm}i=1,2\cdots,n \hspace{0.5cm} g=1,2,\cdots,k$$
+
+$$\sum_{g=1}^k u_{ig}=1,\hspace{0.5cm}i=1,2,\cdots,n$$
+
+$U$ sigue siendo la matriz de pertenencia al cluster, sin embargo ahora cada fila en cada columna tiene un valor entre 0 y 1, el cual mide el valor de pertenencia al cluster. 
+
+### **Algoritmo**
+
+1. Se escoge la matriz $U$ de forma aleatoria
+
+2. Dado $U$, se calcula la matriz de centroides $H$
+
+$$\bf{h}_g = \frac{\sum_{i=1}^n u_{ig}^m \bf{x}_i}{\sum_{i=1}^n u_{ig}^m}$$
+
+
+3. Dado $H$ se actualiza $U$ de la siguiente forma
+
+$$u_{ig}= \frac{1}{\sum_{g'=1}^k\left( \frac{d^2(x_i,h_g)}{d^2(x_i,h_{g'})}\right)^{1/(m-1)}}$$
+4. Repetir 2 y 3.
+
+Existen tres metodos de convergencia
+
+$$\vert\vert U^{(r+1)}-U^{(r)}\vert\vert < \epsilon$$
+
+$$\vert\vert H^{(r+1)}-H^{(r)}\vert\vert < \epsilon$$
+
+$$\vert J^{(r+1)}-J^{(r)}\vert < \epsilon$$
+
+Considerando la norma Frobenius.
+
+## Calidad del cluster
+
+Para medir la calidad del cluster existen diversas medidas. 
+
+- **Partition Coefficient** (PC)
+
+$$PC = \sum_{i=1}^n\sum_{g=1}^k\frac{u_{ig}^2}{n}$$
+Se prueba para distintos $k$ y se elige el $k$ correspondiente al máximo $PC$ como el óptimo.
+
+- **Partition Entropy** (PE)
+
+$$PE=-\sum_{i=1}^n\sum_{g=1}^k \frac{u_{ig}log(u_{ig})}{n}$$
+
+En este caso probamos para distintos $k$ y se elige el $k$ correspondiente al mínimo $PE$ como el óptimo. 
+
+- **Xie and Beni** (XB)
+
+- **Fuzzy Silhouette** (FS)
+
+## Fuzzy K-means en R
+
+```{r}
+library(datasetsICR)
+data ("wine")
+Class <- wine$Class
+wine <- wine[,-1]
+```
+
+Utilizamos la función `FKM` de la libreria  `flcust`. `stand= 1` permite estandarizar los datos. El algoritmo decide el número óptimo de clusters, por defecto utiliza la medida `Fuzzy Silhouette` para elegir. 
+
+```{r}
+library(fclust)
+wine.FKM <- FKM(X=wine,stand=1,RS=10,seed = 264)
+```
+
+Numero de clusters obtenidos
+
+```{r}
+wine.FKM$k
+```
+
+```{r}
+wine.FKM$criterion
+```
+
+
+Si cambiamos el criterio podriamos obtener otro número óptimo de clusters. 
+
+```{r}
+wine.FKM_pc <- FKM(X=wine,stand=1,RS=10, index='PC', seed = 264)
+```
+```{r}
+wine.FKM_pc$k
+```
+
+```{r}
+wine.FKM_xb <- FKM(X=wine,stand=1,RS=10, index='XB', seed = 264)
+```
+
+```{r}
+wine.FKM_xb$k
+```
+
+
+### Matriz de confusión
+
+```{r}
+table(Class,wine.FKM_xb$clus[, 1])
+```
+Notemos que la clase 2 tiene 3 valores erroneos en el cluster 2. Veamos los grados de pertenencias.
+
+
+Identificamos los valores erroneos
+
+```{r}
+i_mc1 <- which( Class == 2 & wine.FKM_xb$clus[,1]== 2)
+i_mc1
+```
+
+Veamos los grados de pertenencia. Notemos que el objeto 62 y el objeto 119 tienen un grado de pertenencia menor a 0.5, por lo que no son claros.
+
+```{r}
+wine.FKM_xb$U[i_mc1 , ]
+```
+# Plotear
+
+```{r}
+plot.fclust( x = wine.FKM_xb , pca = TRUE )
+```
+
+## **Función cmeans paquete e1071**
+
+```{r}
+wine.Z <- scale(wine , center = TRUE , scale = TRUE)
+```
+
+```{r message=FALSE, warning=FALSE}
+set.seed(264)
+library(e1071)
+wine.Z.cmeans.3<-cmeans(wine.Z,3)
+```
+
+```{r}
+wine.Z.cmeans.3$size
+```
+
+Notemos que las particiones coinciden. 
+
+```{r}
+table(wine.FKM_xb$clus[, 1] , wine.Z.cmeans.3$cluster)
+```
+
+Otra función es `fcm` del paquete `ppclust`. Tambien existe la función `fuzzy.CM`  del paquete `advclust` 
+
+

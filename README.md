@@ -9,3 +9,5 @@ En este [R notebook](https://bastian951.github.io/ClusteringR). encontrarás un 
 - Clustering jerarquico (Aglomerativo, Divisivo)
 
 - Clustering no jerarquico (K-means, K-medoids)
+
+- Fuzzy Clustering (Fuzzy K-means, GK-Fuzzy K-means)

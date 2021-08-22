@@ -28,6 +28,12 @@ navbar:
           href: kmeans.html
         - text: "k-medoids"
           href: pam.html
+    - text: "Fuzzy Clustering"
+      menu:
+        - text: "Fuzzy K-means"
+          href: fkm.html
+        - text: "GK-FKM"
+          HREF: gkfkm.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/

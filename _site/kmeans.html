@@ -294,6 +294,19 @@ $(document).ready(function () {
     </li>
   </ul>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Fuzzy Clustering
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="fkm.html">Fuzzy K-means</a>
+    </li>
+    <li class="dropdown-header">GK-FKM</li>
+  </ul>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -390,10 +403,10 @@ plot(1:k.max , wss, xlab = expression(italic(k)), ylab = expression(italic(W)), 
 <p><img src="kmeans_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>También podemos calcular las diferencias entre el cluster <span class="math inline">\(k\)</span> y <span class="math inline">\(k+1\)</span> con la función <code>diff</code></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.56508  -724.27131  -251.85442  -250.95520  -121.49334  -204.48768
-##  [7]   -35.45934  -136.66661   -23.11156   -93.76689   -96.01757   -14.78591
-## [13]   -57.06005   -41.77823   -13.72690   -60.91464    11.75746   -66.24287
-## [19]   -55.90639</code></pre>
+<pre><code>##  [1] -1259.56508  -724.27131  -273.42086  -144.13459  -295.66310  -113.36000
+##  [7]   -53.44004  -131.72132   -47.27938   -74.41733   -31.88187   -70.75673
+## [13]   -30.95546   -34.01437   -46.90726   -80.89755   -23.17698     7.19471
+## [19]   -82.98071</code></pre>
 <p>Podemos iterar de nuevo para comprobar</p>
 <pre class="r"><code>wss &lt;- numeric()
 wss[1] &lt;- (n-1)*sum(apply(NBA.Z,2,var))
@@ -403,10 +416,10 @@ plot(1:k.max , wss,xlab = expression(italic(k)), ylab = expression(italic(W)),
      type = &quot;b&quot;,lwd = 2)</code></pre>
 <p><img src="kmeans_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>diff(wss)</code></pre>
-<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.41215  -210.38554  -118.42986
-##  [7]  -106.18626   -78.09551   -70.32348   -66.59147   -61.93878   -49.28300
-## [13]   -48.91331   -37.52268   -30.41965   -47.73719   -31.18616   -32.18324
-## [19]   -37.99396</code></pre>
+<pre><code>##  [1] -1259.56508  -724.36690  -273.32528  -229.41215  -210.38554  -118.53340
+##  [7]  -106.08272   -74.25505   -74.17877   -68.87873   -42.65472   -63.96108
+## [13]   -28.32000   -49.81167   -51.00634   -42.99849   -25.11804   -37.76357
+## [19]   -41.30780</code></pre>
 <p>Una forma de elegir el número de clusters es mediante la método del codo. Este método busca el valor <span class="math inline">\(k\)</span> que satisfaga que un incremento de <span class="math inline">\(k\)</span>, no disminuya sustancialmente el valor de <span class="math inline">\(W\)</span>, es decir, se forma una curva. En este caso podriamos elegir <span class="math inline">\(k=3\)</span>.</p>
 <p>Otro gráfico es el de <span class="math inline">\(R^2\)</span></p>
 <p><span class="math display">\[R^2 = 1- \frac{W}{T} = 1- \frac{B}{T}\]</span></p>

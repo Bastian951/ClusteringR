@@ -11,7 +11,7 @@
 
 
 
-<title>k-Medoids</title>
+<title>Fuzzy K-means</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -324,70 +324,133 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore"><strong>k-Medoids</strong></h1>
+<h1 class="title toc-ignore"><strong>Fuzzy K-means</strong></h1>
 
 </div>
 
 
-<p>A diferencia de k-means, k-medoids no utiliza el centroide, si no que utiliza los medoides. Un medoide puede ser definido como el objeto de un grupo cuya disimilaridad media a todos los objetos en el grupo es mínima. Calcular los medoides es mas caro que calcular los centroides.</p>
-<p><span class="math display">\[\min_{\mathbf{U,H}} \sum_{i=1}^n\sum_{g=1}^k u_{ig}d^2(\mathbf{x}_i, \mathbf{h}_g)\]</span> <span class="math display">\[st\hspace{0.5cm} u_{ig}\in \{0,1\}, \hspace{0.5cm}i=\{1,\cdots,n\}, \hspace{0.5cm}g=\{1,\cdots,n\}\]</span></p>
-<p><span class="math display">\[\sum_{g=1}^k u_{ig}=1, \hspace{0.5cm}i=\{1,\cdots,n\}\]</span></p>
-<p><span class="math display">\[\{h_1,\cdots,h_g,\cdots,h_k \} \subseteq \{ x_1, \cdots, x_i,\cdots,x_n\}\]</span></p>
-<ol style="list-style-type: decimal">
-<li>Escoger <span class="math inline">\(k\)</span> medoides aleatorios. Es decir, escoger una matriz <span class="math inline">\(H\)</span></li>
-<li>Dada la matriz <span class="math inline">\(H\)</span>, asignando cada unidad al cluster tal que la distancia el medoide es minima.</li>
-</ol>
-<p><span class="math display">\[u_{ig} = \left\{\begin{matrix}  \displaystyle 1,&amp; \text{ si } g=arg\min_{g&#39;=1,\cdots,k}\, d^2(\mathbf{x}_i, \mathbf{h}_{g&#39;}) \\ 0, &amp;\text{ otro caso }\end{matrix}\right.\]</span></p>
-<ol start="3" style="list-style-type: decimal">
-<li>Dada la matriz <span class="math inline">\(U\)</span>, computar los medoides</li>
-</ol>
-<p><span class="math display">\[h_g = arg\min_{i=1,\cdots,n} \sum_{i&#39;=1}^n u_{ig}d^2(x_i,x_{i&#39;}), \hspace{1cm}g=1,\cdots,k\]</span> 4. Repetir pasos 2 y 3 hasta que no hayan cambios en 2 iteraciones.</p>
-<p>El algoritmo de clustering k-medoids es tambien conocida como el algoritmo <code>PAM</code> (partitioning around medoids)</p>
-<div id="pam-en-libraria-cluster" class="section level2">
-<h2>PAM en libraria cluster</h2>
+<p>En el clustering jerárquico y no jerárquico cada unidad pertenecia a un solo cluster. En el Fuzzy clustering esto no es así. Notemos el siguiente gráfico donde la unidad 8 está entre dos clusters</p>
 <pre class="r"><code>library(datasetsICR)
-data(&quot;NBA.48&quot;)
-NBA &lt;- NBA.48[,c(1,8,10,11,13,14,16,17,18,19,21,22,23,24)]
-
-data(&quot;NBA.game&quot;)
-NBA &lt;- NBA[NBA.game$MIN &gt;= 12,]
-row.names(NBA) &lt;- NBA[,1]
-NBA &lt;- NBA[ , -1]</code></pre>
-<pre class="r"><code>library(cluster)
-res.pam.3 &lt;- pam(x = NBA, k = 3, stand = TRUE)</code></pre>
-<pre class="r"><code>names(res.pam.3)</code></pre>
-<pre><code>##  [1] &quot;medoids&quot;    &quot;id.med&quot;     &quot;clustering&quot; &quot;objective&quot;  &quot;isolation&quot; 
-##  [6] &quot;clusinfo&quot;   &quot;silinfo&quot;    &quot;diss&quot;       &quot;call&quot;       &quot;data&quot;</code></pre>
-<pre class="r"><code>res.pam.3$medoids</code></pre>
-<pre><code>##                  PTS  FGA  FG. X3PA X3P. FTA  FT. OREB DREB AST TOV STL BLK
-## Cedi Osman      19.5 16.6 42.7  7.3 34.8 3.6 77.9  0.9  6.1 3.8 2.2 1.2 0.2
-## Cody Zeller     19.2 13.3 55.1  0.8 27.3 5.4 78.7  4.2  8.6 3.9 2.4 1.5 1.6
-## Emmanuel Mudiay 26.1 22.1 44.6  6.3 32.9 5.6 77.4  1.0  4.9 6.8 4.2 1.3 0.6</code></pre>
-<pre class="r"><code>res.pam.3$clusinfo</code></pre>
-<pre><code>##      size  max_diss  av_diss diameter separation
-## [1,]  226 11.359254 3.300690 14.46731   1.265893
-## [2,]   95  9.187339 4.623588 12.39399   1.309079
-## [3,]   82  9.330624 3.851973 12.54901   1.265893</code></pre>
-<p>Comparemos con k-means</p>
-<pre class="r"><code>NBA.Z &lt;- scale(NBA, center=TRUE, scale=TRUE)</code></pre>
-<pre class="r"><code>res.kmeans.3 &lt;- kmeans(NBA.Z, centers = 3, nstart=50, iter.max=1000)</code></pre>
-<pre class="r"><code>table(res.pam.3$clustering, res.kmeans.3$cluster)</code></pre>
+data(&quot;butterfly&quot;)
+plot(butterfly , type = &quot;n&quot;)
+text(butterfly, labels=1:15)</code></pre>
+<p><img src="fkm_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>El clustering Fuzzy consiste en asignar cada unidad a clusters con grados de pertenencia (difusos) tomando valores en el intervalo [0, 1]</p>
+<div id="fuzzy-k-means-o-fuzzy-c-means" class="section level2">
+<h2><strong>Fuzzy K-means o Fuzzy C-means</strong></h2>
+<p>El propósito del algoritmo Fuzzy K-means (FKM o FCM) es encontrar la mejor partición fuzzy de <span class="math inline">\(n\)</span> unidades en <span class="math inline">\(k\)</span> clusters. El parámetro <span class="math inline">\(m\)</span> se utiliza para ajustar la borrosidad de la partición obtenida (<span class="math inline">\(m&gt; 1\)</span>)</p>
+<p><span class="math display">\[\min_{U,H} J_{FKM} = \sum_{i=1}^n\sum_{g=1}^k u_{ig}^md^2(\bf{x}_i,\bf{h}_g)\]</span></p>
+<p><span class="math display">\[ST\hspace{1cm} u_{ig}\in[0,1], \hspace{1cm}i=1,2\cdots,n \hspace{0.5cm} g=1,2,\cdots,k\]</span></p>
+<p><span class="math display">\[\sum_{g=1}^k u_{ig}=1,\hspace{0.5cm}i=1,2,\cdots,n\]</span></p>
+<p><span class="math inline">\(U\)</span> sigue siendo la matriz de pertenencia al cluster, sin embargo ahora cada fila en cada columna tiene un valor entre 0 y 1, el cual mide el valor de pertenencia al cluster.</p>
+<div id="algoritmo" class="section level3">
+<h3><strong>Algoritmo</strong></h3>
+<ol style="list-style-type: decimal">
+<li><p>Se escoge la matriz <span class="math inline">\(U\)</span> de forma aleatoria</p></li>
+<li><p>Dado <span class="math inline">\(U\)</span>, se calcula la matriz de centroides <span class="math inline">\(H\)</span></p></li>
+</ol>
+<p><span class="math display">\[\bf{h}_g = \frac{\sum_{i=1}^n u_{ig}^m \bf{x}_i}{\sum_{i=1}^n u_{ig}^m}\]</span></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Dado <span class="math inline">\(H\)</span> se actualiza <span class="math inline">\(U\)</span> de la siguiente forma</li>
+</ol>
+<p><span class="math display">\[u_{ig}= \frac{1}{\sum_{g&#39;=1}^k\left( \frac{d^2(x_i,h_g)}{d^2(x_i,h_{g&#39;})}\right)^{1/(m-1)}}\]</span> 4. Repetir 2 y 3.</p>
+<p>Existen tres metodos de convergencia</p>
+<p><span class="math display">\[\vert\vert U^{(r+1)}-U^{(r)}\vert\vert &lt; \epsilon\]</span></p>
+<p><span class="math display">\[\vert\vert H^{(r+1)}-H^{(r)}\vert\vert &lt; \epsilon\]</span></p>
+<p><span class="math display">\[\vert J^{(r+1)}-J^{(r)}\vert &lt; \epsilon\]</span></p>
+<p>Considerando la norma Frobenius.</p>
+</div>
+</div>
+<div id="calidad-del-cluster" class="section level2">
+<h2>Calidad del cluster</h2>
+<p>Para medir la calidad del cluster existen diversas medidas.</p>
+<ul>
+<li><strong>Partition Coefficient</strong> (PC)</li>
+</ul>
+<p><span class="math display">\[PC = \sum_{i=1}^n\sum_{g=1}^k\frac{u_{ig}^2}{n}\]</span> Se prueba para distintos <span class="math inline">\(k\)</span> y se elige el <span class="math inline">\(k\)</span> correspondiente al máximo <span class="math inline">\(PC\)</span> como el óptimo.</p>
+<ul>
+<li><strong>Partition Entropy</strong> (PE)</li>
+</ul>
+<p><span class="math display">\[PE=-\sum_{i=1}^n\sum_{g=1}^k \frac{u_{ig}log(u_{ig})}{n}\]</span></p>
+<p>En este caso probamos para distintos <span class="math inline">\(k\)</span> y se elige el <span class="math inline">\(k\)</span> correspondiente al mínimo <span class="math inline">\(PE\)</span> como el óptimo.</p>
+<ul>
+<li><p><strong>Xie and Beni</strong> (XB)</p></li>
+<li><p><strong>Fuzzy Silhouette</strong> (FS)</p></li>
+</ul>
+</div>
+<div id="fuzzy-k-means-en-r" class="section level2">
+<h2>Fuzzy K-means en R</h2>
+<pre class="r"><code>library(datasetsICR)
+data (&quot;wine&quot;)
+Class &lt;- wine$Class
+wine &lt;- wine[,-1]</code></pre>
+<p>Utilizamos la función <code>FKM</code> de la libreria <code>flcust</code>. <code>stand= 1</code> permite estandarizar los datos. El algoritmo decide el número óptimo de clusters, por defecto utiliza la medida <code>Fuzzy Silhouette</code> para elegir.</p>
+<pre class="r"><code>library(fclust)
+wine.FKM &lt;- FKM(X=wine,stand=1,RS=10,seed = 264)</code></pre>
+<pre><code>## The default value k=2:6 has been set 
+## The default index SIL.F has been set 
+## The default value alpha=1 has been set for computing SIL.F</code></pre>
+<p>Numero de clusters obtenidos</p>
+<pre class="r"><code>wine.FKM$k</code></pre>
+<pre><code>## Number of clusters 
+##                  4</code></pre>
+<pre class="r"><code>wine.FKM$criterion</code></pre>
+<pre><code>## SIL.F k=2 SIL.F k=3 SIL.F k=4 SIL.F k=5 SIL.F k=6 
+## 0.4996776 0.5466120 0.5638547 0.5061594 0.2432936</code></pre>
+<p>Si cambiamos el criterio podriamos obtener otro número óptimo de clusters.</p>
+<pre class="r"><code>wine.FKM_pc &lt;- FKM(X=wine,stand=1,RS=10, index=&#39;PC&#39;, seed = 264)</code></pre>
+<pre><code>## The default value k=2:6 has been set</code></pre>
+<pre class="r"><code>wine.FKM_pc$k</code></pre>
+<pre><code>## Number of clusters 
+##                  2</code></pre>
+<pre class="r"><code>wine.FKM_xb &lt;- FKM(X=wine,stand=1,RS=10, index=&#39;XB&#39;, seed = 264)</code></pre>
+<pre><code>## The default value k=2:6 has been set</code></pre>
+<pre class="r"><code>wine.FKM_xb$k</code></pre>
+<pre><code>## Number of clusters 
+##                  3</code></pre>
+<div id="matriz-de-confusión" class="section level3">
+<h3>Matriz de confusión</h3>
+<pre class="r"><code>table(Class,wine.FKM_xb$clus[, 1])</code></pre>
+<pre><code>##      
+## Class  1  2  3
+##     1  0  0 59
+##     2 65  3  3
+##     3  0 48  0</code></pre>
+<p>Notemos que la clase 2 tiene 3 valores erroneos en el cluster 2. Veamos los grados de pertenencias.</p>
+<p>Identificamos los valores erroneos</p>
+<pre class="r"><code>i_mc1 &lt;- which( Class == 2 &amp; wine.FKM_xb$clus[,1]== 2)
+i_mc1</code></pre>
+<pre><code>##  Obj 62  Obj 84 Obj 119 
+##      62      84     119</code></pre>
+<p>Veamos los grados de pertenencia. Notemos que el objeto 62 y el objeto 119 tienen un grado de pertenencia menor a 0.5, por lo que no son claros.</p>
+<pre class="r"><code>wine.FKM_xb$U[i_mc1 , ]</code></pre>
+<pre><code>##            Clus 1    Clus 2    Clus 3
+## Obj 62  0.3790068 0.4398723 0.1811209
+## Obj 84  0.2625264 0.6149427 0.1225309
+## Obj 119 0.3696357 0.4726816 0.1576827</code></pre>
+</div>
+</div>
+<div id="plotear" class="section level1">
+<h1>Plotear</h1>
+<pre class="r"><code>plot.fclust( x = wine.FKM_xb , pca = TRUE )</code></pre>
+<p><img src="fkm_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<div id="función-cmeans-paquete-e1071" class="section level2">
+<h2><strong>Función cmeans paquete e1071</strong></h2>
+<pre class="r"><code>wine.Z &lt;- scale(wine , center = TRUE , scale = TRUE)</code></pre>
+<pre class="r"><code>set.seed(264)
+library(e1071)
+wine.Z.cmeans.3&lt;-cmeans(wine.Z,3)</code></pre>
+<pre class="r"><code>wine.Z.cmeans.3$size</code></pre>
+<pre><code>## [1] 62 51 65</code></pre>
+<p>Notemos que las particiones coinciden.</p>
+<pre class="r"><code>table(wine.FKM_xb$clus[, 1] , wine.Z.cmeans.3$cluster)</code></pre>
 <pre><code>##    
-##       1   2   3
-##   1 210   0  16
-##   2  10  80   5
-##   3   6   0  76</code></pre>
-<pre class="r"><code>library(mclust)
-adjustedRandIndex(res.pam.3$clustering, res.kmeans.3$cluster)</code></pre>
-<pre><code>## [1] 0.7407294</code></pre>
-<pre class="r"><code>library(factoextra)</code></pre>
-<pre class="r"><code>fviz_cluster(res.pam.3, data = NBA,
-             palette = c(&quot;#2E9FDF&quot;, &quot;#00AFBB&quot;, &quot;#E7B800&quot;), 
-             geom = &quot;point&quot;,
-             ellipse.type = &quot;convex&quot;, 
-             ggtheme = theme_bw()
-             )</code></pre>
-<p><img src="pam_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+##      1  2  3
+##   1  0  0 65
+##   2  0 51  0
+##   3 62  0  0</code></pre>
+<p>Otra función es <code>fcm</code> del paquete <code>ppclust</code>. Tambien existe la función <code>fuzzy.CM</code> del paquete <code>advclust</code></p>
+</div>
 </div>
 
 

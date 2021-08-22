@@ -1,0 +1,22 @@
+---
+title: "Extensiones Gustafson-Kessel de Fuzzy k-Means"
+output: html_document
+---
+
+FKM y k-means utilizan la distancia Euclideana y obtenemos Clusters esfericos, por lo que en presencia de clusters no esfericos estos métodos pueden fallar. Para solucionar esto Gustafson y Kessel propusieron extender el FKM reemplazando la distancia Euclideana por la distancia de Mahalanobis especifica para clusters. 
+
+$$d_M^2(x_i,h_g) = (x_i-h_g)`M_g(x_i-h_g)$$
+
+donde $M_g$ es una matriz simetrica semidefinida positiva. 
+
+El problema de optimización es el siguiente
+
+$$\min_{U,H,M_1,\cdots,M_k} J_{GK-FKM} = \sum_{i=1}^n\sum_{g=1}^k u_{ig}^md_M^2(\bf{x}_i,\bf{h}_g)$$
+
+$$ST\hspace{1cm} u_{ig}\in[0,1], \hspace{1cm}i=1,2\cdots,n \hspace{0.5cm} g=1,2,\cdots,k$$
+
+$$\sum_{g=1}^k u_{ig}=1,\hspace{0.5cm}i=1,2,\cdots,n$$
+
+$$\vert M_g\vert = \rho_g >0,\hspace{1cm} g=1,\cdots,k$$
+El algoritmo es:
+
