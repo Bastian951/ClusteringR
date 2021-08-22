@@ -33,7 +33,7 @@ navbar:
         - text: "Fuzzy K-means"
           href: fkm.html
         - text: "GK-FKM"
-          HREF: gkfkm.html
+          href: gkfkm.html
   right: 
     - icon: fa-github fa-lg
       href: http://github.com/Bastian951/
